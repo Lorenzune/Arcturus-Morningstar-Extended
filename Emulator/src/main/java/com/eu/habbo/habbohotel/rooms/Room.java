@@ -194,7 +194,6 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
   private volatile boolean wiredSettingsLoaded;
   private int wiredInspectMask = WIRED_ACCESS_DEFAULT_INSPECT_MASK;
   private int wiredModifyMask = WIRED_ACCESS_DEFAULT_MODIFY_MASK;
-
   private boolean youtubeEnabled = false;
   private String youtubeCurrentVideo = "";
   private String youtubeSenderName = "";
