@@ -80,13 +80,17 @@ END//
 DELIMITER ;
 
 CALL `_add_fk_if_missing`('rooms', 'fk_rooms_owner', 'owner_id', 'users', 'id', 'CASCADE');
-CALL `_add_fk_if_missing`('items', 'fk_items_user', 'user_id', 'users', 'id', 'CASCADE');
 CALL `_add_fk_if_missing`('catalog_items', 'fk_catitems_page', 'page_id', 'catalog_pages', 'id', 'CASCADE');
 CALL `_add_fk_if_missing`('guilds', 'fk_guilds_user', 'user_id', 'users', 'id', 'CASCADE');
 
 DROP PROCEDURE IF EXISTS `_add_id_pk_if_missing`;
 DROP PROCEDURE IF EXISTS `_add_index_if_missing`;
 DROP PROCEDURE IF EXISTS `_add_fk_if_missing`;
+
+# Make sure thenb System account exists
+INSERT INTO `users` (`id`, `username`, `password`, `ip_register`, `ip_current`, `motto`, `look`, `rank`, `credits`)
+SELECT 0, '[SYSTEM]', '!', '127.0.0.1', '127.0.0.1', 'System sentinel - do not delete', '', 1, 0
+WHERE NOT EXISTS (SELECT 1 FROM `users` WHERE `id` = 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
 SET SQL_MODE = @OLD_SQL_MODE;
