@@ -581,4 +581,9 @@ public class Outgoing {
     public static final int UserNickIconsComposer = 7004;
     public static final int AvailableCommandsComposer = 4050;
 
+    // YouTube Room Broadcast
+    public static final int YouTubeRoomBroadcastComposer = 8001;
+    public static final int YouTubeRoomWatchersComposer = 8002;
+    public static final int YouTubeRoomSettingsComposer = 8003;
+
 }
