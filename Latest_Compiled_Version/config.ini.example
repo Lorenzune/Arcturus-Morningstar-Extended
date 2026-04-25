@@ -8,6 +8,9 @@ db.params=
 db.pool.minsize=25
 db.pool.maxsize=100
 
+# Encrypt your traffic
+crypto.ws.enabled=0
+
 #Game Configuration.
 #Host IP. Most likely just 0.0.0.0 Use 127.0.0.1 if you want to play on LAN.
 game.host=0.0.0.0
@@ -53,4 +56,6 @@ nitro.secure.master_key=change-me-to-a-long-random-secret
 
 # Remember-me login tokens.
 login.remember.enabled=true
-login.remember.days=30
+login.remember.duration.days=30
+# Optional: set a persistent remember-me JWT secret here, otherwise one is generated and stored in emulator_settings.
+login.remember.jwt.secret=
