@@ -34,3 +34,18 @@ INSERT IGNORE INTO `custom_nick_icons_catalog` (`icon_key`, `display_name`, `poi
     ('6', 'Icon 6', 10, 0, 1, 6);
 ALTER TABLE `custom_nick_icons_catalog`
     ADD COLUMN IF NOT EXISTS `display_name` VARCHAR(100) NOT NULL DEFAULT '' AFTER `icon_key`;
+	
+ALTER TABLE `users`
+    ADD COLUMN IF NOT EXISTS `remember_token_hash` VARCHAR(64) NOT NULL DEFAULT '' AFTER `auth_ticket`;
+
+ALTER TABLE `users`
+    ADD COLUMN IF NOT EXISTS `remember_token_expires_at` INT(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `remember_token_hash`;
+
+ALTER TABLE `users`
+    ADD INDEX IF NOT EXISTS `idx_users_remember_token_hash` (`remember_token_hash`);
+
+
+INSERT INTO `wired_emulator_settings` (`key`, `value`, `comment`)
+VALUES ('hotel.wired.message.max_length', '512', 'Maximum length of text fields used by wired messages and bot text effects.')
+ON DUPLICATE KEY UPDATE `value` = '512';
+
