@@ -3,9 +3,7 @@ package com.eu.habbo.habbohotel.commands;
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.catalog.CatalogManager;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
-import com.eu.habbo.messages.outgoing.generic.alerts.MessagesForYouComposer;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 
@@ -13,9 +11,10 @@ public class AboutCommand extends Command {
     public AboutCommand() {
         super(null, new String[]{"about", "info", "online", "server"});
     }
-    public static String credits = "Arcturus Morningstar is an opensource project based on Arcturus By TheGeneral \n" +
-            "The Following people have all contributed to this emulator:\n" +
-            "TheGeneral\n Beny\n Alejandro\n Capheus\n Skeletor\n Harmonic\n Mike\n Remco\n zGrav \n Quadral \n Harmony\n Swirny\n ArpyAge\n Mikkel\n Rodolfo\n Rasmus\n Kitt Mustang\n Snaiker\n nttzx\n necmi\n Dome\n Jose Flores\n Cam\n Oliver\n Narzo\n Tenshie\n MartenM\n Ridge\n SenpaiDipper\n Snaiker\n Thijmen\n DuckieTM\n simoleo89\n Medievalshell\n Lorenzo (the wired master)";
+
+    public static final String NITRO_INFO_SENTINEL = "[NITRO_INFO_V1]";
+    public static final String REPORT_ISSUES_URL = "https://github.com/duckietm/Nitro-V3/issues";
+
     @Override
     public boolean handle(GameClient gameClient, String[] params) {
 
@@ -27,28 +26,31 @@ public class AboutCommand extends Command {
         long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
         long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) * 60);
 
-        String message = "<b>" + Emulator.version + "</b>\r\n";
+        StringBuilder message = new StringBuilder();
+        message.append(NITRO_INFO_SENTINEL).append("\r");
+        message.append("<b>").append(Emulator.version).append("</b>\r\n");
 
         if (Emulator.getConfig().getBoolean("info.shown", true)) {
-            message += "<b>Hotel Statistics</b>\r" +
-                    "- Online Users: " + Emulator.getGameEnvironment().getHabboManager().getOnlineCount() + "\r" +
-                    "- Active Rooms: " + Emulator.getGameEnvironment().getRoomManager().getActiveRooms().size() + "\r" +
-                    "- Shop:  " + Emulator.getGameEnvironment().getCatalogManager().catalogPages.size() + " pages and " + CatalogManager.catalogItemAmount + " items. \r" +
-                    "- Furni: " + Emulator.getGameEnvironment().getItemManager().getItems().size() + " item definitions" + "\r" +
-                    "\n" +
-                    "<b>Server Statistics</b>\r" +
-                    "- Uptime: " + day + (day > 1 ? " days, " : " day, ") + hours + (hours > 1 ? " hours, " : " hour, ") + minute + (minute > 1 ? " minutes, " : " minute, ") + second + (second > 1 ? " seconds!" : " second!") + "\r" +
-                    "- RAM Usage: " + (Emulator.getRuntime().totalMemory() - Emulator.getRuntime().freeMemory()) / (1024 * 1024) + "/" + (Emulator.getRuntime().freeMemory()) / (1024 * 1024) + "MB\r" +
-                    "- CPU Cores: " + Emulator.getRuntime().availableProcessors() + "\r" +
-                    "- Total Memory: " + Emulator.getRuntime().maxMemory() / (1024 * 1024) + "MB" + "\r\n";
+            message.append("<b>Hotel Statistics</b>\r")
+                    .append("- Online Users: ").append(Emulator.getGameEnvironment().getHabboManager().getOnlineCount()).append("\r")
+                    .append("- Active Rooms: ").append(Emulator.getGameEnvironment().getRoomManager().getActiveRooms().size()).append("\r")
+                    .append("- Shop: ").append(Emulator.getGameEnvironment().getCatalogManager().catalogPages.size()).append(" pages and ").append(CatalogManager.catalogItemAmount).append(" items.\r")
+                    .append("- Furni: ").append(Emulator.getGameEnvironment().getItemManager().getItems().size()).append(" item definitions\r")
+                    .append("\n")
+                    .append("<b>Server Statistics</b>\r")
+                    .append("- Uptime: ").append(day).append(day == 1 ? " day, " : " days, ").append(hours).append(hours == 1 ? " hour, " : " hours, ").append(minute).append(minute == 1 ? " minute, " : " minutes, ").append(second).append(second == 1 ? " second!" : " seconds!").append("\r")
+                    .append("- RAM Usage: ").append((Emulator.getRuntime().totalMemory() - Emulator.getRuntime().freeMemory()) / (1024 * 1024)).append("/").append((Emulator.getRuntime().freeMemory()) / (1024 * 1024)).append("MB\r")
+                    .append("- CPU Cores: ").append(Emulator.getRuntime().availableProcessors()).append("\r")
+                    .append("- Total Memory: ").append(Emulator.getRuntime().maxMemory() / (1024 * 1024)).append("MB\r\n");
         }
 
-        message += "\r" +
+        message.append("<b>Credits</b>\r")
+                .append("- The General\r")
+                .append("- Krews Team\r")
+                .append("- DuckieTM, simoleo89, Medievalshell, Lorenzo (the wired master), Remco\r\n")
+                .append("Report issues at: ").append(REPORT_ISSUES_URL);
 
-                "<b>Thanks for using Arcturus. Report issues on the forums. http://arcturus.wf \r\r" +
-                "    - The General";
-        gameClient.getHabbo().alert(message);
-        gameClient.sendResponse(new MessagesForYouComposer(Collections.singletonList(credits)));
+        gameClient.getHabbo().alert(message.toString());
         return true;
     }
 }

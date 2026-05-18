@@ -1,15 +1,31 @@
 -- Normalizes the legacy `permissions` table into:
 -- 1. `permission_ranks`       -> one row per rank with rank metadata.
--- 2. `permission_definitions` -> one row per permission key with comments and one `rank_<id>` column per rank.
+-- 2. `permission_definitions` -> one row per permission key with comments
+--                               and one `rank_<id>` column per rank.
 --
--- This migration keeps the old `permissions` table untouched so the emulator can safely fall back to it.
--- It also cleans up the older experimental normalized objects if they were already created.
+-- This version uses NO stored procedures and NO DELIMITER directives, so it
+-- works in any MySQL/MariaDB client (HeidiSQL, DBeaver, mysql CLI, phpMyAdmin)
+-- regardless of how that client handles delimiters.
+--
+-- It builds two large dynamic SQL strings via GROUP_CONCAT and executes each
+-- with PREPARE / EXECUTE. That replaces both stored procedures from the
+-- original migration.
 
+SET SESSION group_concat_max_len = 1048576;
+
+-- --------------------------------------------------------------------------
+-- Clean up older experimental objects from previous attempts.
+-- --------------------------------------------------------------------------
 DROP VIEW IF EXISTS `permissions_matrix_view`;
 DROP PROCEDURE IF EXISTS `refresh_permissions_matrix_view`;
+DROP PROCEDURE IF EXISTS `refresh_permission_definition_rank_columns`;
+DROP PROCEDURE IF EXISTS `refresh_permission_definition_values`;
 DROP TABLE IF EXISTS `permission_rank_values`;
 DROP TABLE IF EXISTS `permission_nodes`;
 
+-- --------------------------------------------------------------------------
+-- Target tables.
+-- --------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `permission_ranks` (
   `id` int(11) NOT NULL,
   `rank_name` varchar(25) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
@@ -42,41 +58,30 @@ ALTER TABLE `permission_definitions`
   DROP COLUMN IF EXISTS `value_type`,
   DROP COLUMN IF EXISTS `sort_order`;
 
+-- --------------------------------------------------------------------------
+-- Make sure the legacy `permissions` table has the rank-metadata columns
+-- the migration reads from it.
+-- --------------------------------------------------------------------------
+ALTER TABLE `permissions`
+  ADD COLUMN IF NOT EXISTS `hidden_rank` tinyint(1) NOT NULL DEFAULT 0 AFTER `rank_name`,
+  ADD COLUMN IF NOT EXISTS `job_description` varchar(255) NOT NULL DEFAULT 'Here to help' AFTER `badge`,
+  ADD COLUMN IF NOT EXISTS `staff_color` varchar(8) NOT NULL DEFAULT '#327fa8' AFTER `job_description`,
+  ADD COLUMN IF NOT EXISTS `staff_background` varchar(255) NOT NULL DEFAULT 'staff-bg.png' AFTER `staff_color`;
+
+-- --------------------------------------------------------------------------
+-- Copy rank metadata into `permission_ranks`.
+-- --------------------------------------------------------------------------
 INSERT INTO `permission_ranks` (
-  `id`,
-  `rank_name`,
-  `hidden_rank`,
-  `badge`,
-  `job_description`,
-  `staff_color`,
-  `staff_background`,
-  `level`,
-  `room_effect`,
-  `log_commands`,
-  `prefix`,
-  `prefix_color`,
-  `auto_credits_amount`,
-  `auto_pixels_amount`,
-  `auto_gotw_amount`,
-  `auto_points_amount`
+  `id`, `rank_name`, `hidden_rank`, `badge`, `job_description`,
+  `staff_color`, `staff_background`, `level`, `room_effect`, `log_commands`,
+  `prefix`, `prefix_color`,
+  `auto_credits_amount`, `auto_pixels_amount`, `auto_gotw_amount`, `auto_points_amount`
 )
 SELECT
-  `id`,
-  `rank_name`,
-  `hidden_rank`,
-  `badge`,
-  `job_description`,
-  `staff_color`,
-  `staff_background`,
-  `level`,
-  `room_effect`,
-  `log_commands`,
-  `prefix`,
-  `prefix_color`,
-  `auto_credits_amount`,
-  `auto_pixels_amount`,
-  `auto_gotw_amount`,
-  `auto_points_amount`
+  `id`, `rank_name`, `hidden_rank`, `badge`, `job_description`,
+  `staff_color`, `staff_background`, `level`, `room_effect`, `log_commands`,
+  `prefix`, `prefix_color`,
+  `auto_credits_amount`, `auto_pixels_amount`, `auto_gotw_amount`, `auto_points_amount`
 FROM `permissions`
 ON DUPLICATE KEY UPDATE
   `rank_name` = VALUES(`rank_name`),
@@ -95,55 +100,30 @@ ON DUPLICATE KEY UPDATE
   `auto_gotw_amount` = VALUES(`auto_gotw_amount`),
   `auto_points_amount` = VALUES(`auto_points_amount`);
 
-DROP PROCEDURE IF EXISTS `refresh_permission_definition_rank_columns`;
+-- --------------------------------------------------------------------------
+-- Add a `rank_<id>` column to `permission_definitions` for every rank,
+-- in one dynamic ALTER TABLE statement.
+-- (Replaces the refresh_permission_definition_rank_columns procedure.)
+-- --------------------------------------------------------------------------
+SET @add_rank_columns_sql = NULL;
 
-DELIMITER $$
-CREATE PROCEDURE `refresh_permission_definition_rank_columns`()
-BEGIN
-  DECLARE done INT DEFAULT 0;
-  DECLARE current_rank_id INT;
-  DECLARE current_column_name VARCHAR(32);
-  DECLARE column_exists INT DEFAULT 0;
-  DECLARE rank_cursor CURSOR FOR SELECT `id` FROM `permission_ranks` ORDER BY `id` ASC;
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+SELECT GROUP_CONCAT(
+         CONCAT('ADD COLUMN IF NOT EXISTS `rank_', `id`, '` tinyint(3) unsigned NOT NULL DEFAULT 0')
+         ORDER BY `id` ASC
+         SEPARATOR ', '
+       )
+  INTO @add_rank_columns_sql
+FROM `permission_ranks`;
 
-  OPEN rank_cursor;
+SET @add_rank_columns_sql = CONCAT('ALTER TABLE `permission_definitions` ', @add_rank_columns_sql);
 
-  rank_loop: LOOP
-    FETCH rank_cursor INTO current_rank_id;
+PREPARE add_rank_columns_stmt FROM @add_rank_columns_sql;
+EXECUTE add_rank_columns_stmt;
+DEALLOCATE PREPARE add_rank_columns_stmt;
 
-    IF done = 1 THEN
-      LEAVE rank_loop;
-    END IF;
-
-    SET current_column_name = CONCAT('rank_', current_rank_id);
-
-    SELECT COUNT(*)
-      INTO column_exists
-    FROM `information_schema`.`columns`
-    WHERE `table_schema` = DATABASE()
-      AND `table_name` = 'permission_definitions'
-      AND `column_name` = current_column_name;
-
-    IF column_exists = 0 THEN
-      SET @alter_permissions_column_sql = CONCAT(
-        'ALTER TABLE `permission_definitions` ADD COLUMN `',
-        current_column_name,
-        '` tinyint(3) unsigned NOT NULL DEFAULT 0'
-      );
-
-      PREPARE alter_permissions_column_stmt FROM @alter_permissions_column_sql;
-      EXECUTE alter_permissions_column_stmt;
-      DEALLOCATE PREPARE alter_permissions_column_stmt;
-    END IF;
-  END LOOP;
-
-  CLOSE rank_cursor;
-END$$
-DELIMITER ;
-
-CALL `refresh_permission_definition_rank_columns`();
-
+-- --------------------------------------------------------------------------
+-- Seed `permission_definitions` from the columns of the legacy table.
+-- --------------------------------------------------------------------------
 INSERT INTO `permission_definitions` (
   `permission_key`,
   `max_value`,
@@ -187,27 +167,18 @@ FROM `information_schema`.`columns`
 WHERE `table_schema` = DATABASE()
   AND `table_name` = 'permissions'
   AND `column_name` NOT IN (
-    'id',
-    'rank_name',
-    'hidden_rank',
-    'badge',
-    'job_description',
-    'staff_color',
-    'staff_background',
-    'level',
-    'room_effect',
-    'log_commands',
-    'prefix',
-    'prefix_color',
-    'auto_credits_amount',
-    'auto_pixels_amount',
-    'auto_gotw_amount',
-    'auto_points_amount'
+    'id', 'rank_name', 'hidden_rank', 'badge', 'job_description',
+    'staff_color', 'staff_background', 'level', 'room_effect', 'log_commands',
+    'prefix', 'prefix_color',
+    'auto_credits_amount', 'auto_pixels_amount', 'auto_gotw_amount', 'auto_points_amount'
   )
 ON DUPLICATE KEY UPDATE
   `max_value` = VALUES(`max_value`),
-  `comment` = VALUES(`comment`);
+  `comment`   = VALUES(`comment`);
 
+-- --------------------------------------------------------------------------
+-- Override generated comments with curated text where we have it.
+-- --------------------------------------------------------------------------
 DROP TEMPORARY TABLE IF EXISTS `tmp_permission_comments`;
 
 CREATE TEMPORARY TABLE `tmp_permission_comments` (
@@ -421,79 +392,107 @@ SET pd.`comment` = tc.`comment`;
 
 DROP TEMPORARY TABLE IF EXISTS `tmp_permission_comments`;
 
-DROP PROCEDURE IF EXISTS `refresh_permission_definition_values`;
+-- --------------------------------------------------------------------------
+-- Copy values from the wide `permissions` table into each `rank_<id>` column
+-- of `permission_definitions`, one rank at a time, via dynamic SQL.
+-- (Replaces the refresh_permission_definition_values procedure.)
+--
+-- Strategy: build a single UPDATE per rank that joins `permission_definitions`
+-- against a derived table whose rows are (permission_key, value) for that
+-- rank — one row per permission column in `permissions`.
+-- --------------------------------------------------------------------------
 
-DELIMITER $$
-CREATE PROCEDURE `refresh_permission_definition_values`()
-BEGIN
-  DECLARE done INT DEFAULT 0;
-  DECLARE current_rank_id INT;
-  DECLARE current_column_name VARCHAR(32);
-  DECLARE rank_cursor CURSOR FOR SELECT `id` FROM `permission_ranks` ORDER BY `id` ASC;
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+-- We need to loop over rank ids without a stored procedure. We do that by
+-- selecting all rank ids into a comma-separated string and then iterating
+-- with substring math using a CTE-driven counter. Simpler: build one giant
+-- UPDATE per rank by hand using GROUP_CONCAT and then EXECUTE each in turn.
+--
+-- To avoid a procedural loop entirely, we instead emit a *single* UPDATE
+-- that uses CASE expressions to set every `rank_<id>` column from a single
+-- derived table containing all ranks' values. This is one PREPARE / EXECUTE.
 
-  OPEN rank_cursor;
+SET @permission_columns_sql = NULL;
 
-  rank_loop: LOOP
-    FETCH rank_cursor INTO current_rank_id;
+-- All the permission columns from the legacy table, comma separated and quoted.
+SELECT GROUP_CONCAT(
+         CONCAT('`', REPLACE(`column_name`, '`', '``'), '`')
+         ORDER BY `ordinal_position`
+         SEPARATOR ', '
+       )
+  INTO @permission_columns_sql
+FROM `information_schema`.`columns`
+WHERE `table_schema` = DATABASE()
+  AND `table_name` = 'permissions'
+  AND `column_name` NOT IN (
+    'id', 'rank_name', 'hidden_rank', 'badge', 'job_description',
+    'staff_color', 'staff_background', 'level', 'room_effect', 'log_commands',
+    'prefix', 'prefix_color',
+    'auto_credits_amount', 'auto_pixels_amount', 'auto_gotw_amount', 'auto_points_amount'
+  );
 
-    IF done = 1 THEN
-      LEAVE rank_loop;
-    END IF;
+-- Build the UNPIVOT body: one "SELECT id, 'col' AS k, `col` AS v FROM permissions UNION ALL ..." per column.
+SET @unpivot_sql = NULL;
 
-    SET current_column_name = CONCAT('rank_', current_rank_id);
+SELECT GROUP_CONCAT(
+         CONCAT(
+           'SELECT `id` AS rank_id, ''',
+           REPLACE(`column_name`, '''', ''''''),
+           ''' AS permission_key, CAST(COALESCE(`',
+           REPLACE(`column_name`, '`', '``'),
+           '`, ''0'') AS UNSIGNED) AS permission_value FROM `permissions`'
+         )
+         ORDER BY `ordinal_position`
+         SEPARATOR ' UNION ALL '
+       )
+  INTO @unpivot_sql
+FROM `information_schema`.`columns`
+WHERE `table_schema` = DATABASE()
+  AND `table_name` = 'permissions'
+  AND `column_name` NOT IN (
+    'id', 'rank_name', 'hidden_rank', 'badge', 'job_description',
+    'staff_color', 'staff_background', 'level', 'room_effect', 'log_commands',
+    'prefix', 'prefix_color',
+    'auto_credits_amount', 'auto_pixels_amount', 'auto_gotw_amount', 'auto_points_amount'
+  );
 
-    SELECT GROUP_CONCAT(
-      CONCAT(
-        'SELECT ''',
-        REPLACE(`column_name`, '''', ''''''),
-        ''' AS permission_key, CAST(COALESCE(`',
-        REPLACE(`column_name`, '`', '``'),
-        '`, ''0'') AS UNSIGNED) AS permission_value FROM `permissions` WHERE `id` = ',
-        current_rank_id
-      )
-      ORDER BY `ordinal_position`
-      SEPARATOR ' UNION ALL '
-    ) INTO @permission_rank_source_sql
-    FROM `information_schema`.`columns`
-    WHERE `table_schema` = DATABASE()
-      AND `table_name` = 'permissions'
-      AND `column_name` NOT IN (
-        'id',
-        'rank_name',
-        'hidden_rank',
-        'badge',
-        'job_description',
-        'staff_color',
-        'staff_background',
-        'level',
-        'room_effect',
-        'log_commands',
-        'prefix',
-        'prefix_color',
-        'auto_credits_amount',
-        'auto_pixels_amount',
-        'auto_gotw_amount',
-        'auto_points_amount'
-      );
+-- Build the SET clause: `rank_<id>` = MAX(CASE WHEN rank_id = <id> THEN permission_value END) for each rank.
+SET @set_clause_sql = NULL;
 
-    SET @permission_rank_update_sql = CONCAT(
-      'UPDATE `permission_definitions` pd ',
-      'INNER JOIN (',
-      @permission_rank_source_sql,
-      ') src ON src.permission_key = pd.permission_key ',
-      'SET pd.`',
-      current_column_name,
-      '` = src.permission_value'
-    );
+SELECT GROUP_CONCAT(
+         CONCAT(
+           'pd.`rank_', `id`,
+           '` = COALESCE(src.`rank_', `id`, '`, pd.`rank_', `id`, '`)'
+         )
+         ORDER BY `id` ASC
+         SEPARATOR ', '
+       )
+  INTO @set_clause_sql
+FROM `permission_ranks`;
 
-    PREPARE permission_rank_update_stmt FROM @permission_rank_update_sql;
-    EXECUTE permission_rank_update_stmt;
-    DEALLOCATE PREPARE permission_rank_update_stmt;
-  END LOOP;
+-- Pivot subquery: one row per permission_key, one column per rank_<id>.
+SET @pivot_sql = NULL;
 
-  CLOSE rank_cursor;
-END$$
-DELIMITER ;
+SELECT GROUP_CONCAT(
+         CONCAT(
+           'MAX(CASE WHEN rank_id = ', `id`,
+           ' THEN permission_value END) AS `rank_', `id`, '`'
+         )
+         ORDER BY `id` ASC
+         SEPARATOR ', '
+       )
+  INTO @pivot_sql
+FROM `permission_ranks`;
 
-CALL `refresh_permission_definition_values`();
+SET @final_update_sql = CONCAT(
+  'UPDATE `permission_definitions` pd ',
+  'INNER JOIN ( ',
+    'SELECT permission_key, ', @pivot_sql, ' ',
+    'FROM ( ', @unpivot_sql, ' ) u ',
+    'GROUP BY permission_key ',
+  ') src ON src.permission_key = pd.`permission_key` ',
+  'SET ', @set_clause_sql
+);
+
+PREPARE final_update_stmt FROM @final_update_sql;
+EXECUTE final_update_stmt;
+DEALLOCATE PREPARE final_update_stmt;

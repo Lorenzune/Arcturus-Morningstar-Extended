@@ -121,6 +121,12 @@ INSERT IGNORE INTO `emulator_settings` (`key`, `value`) VALUES
 INSERT IGNORE INTO `emulator_settings` (`key`, `value`) VALUES
 ('camera.extradata', '{"t":"%timestamp%","u":"%id%","m":"","s":"%room_id%","w":"%url%"}');
 
+INSERT INTO emulator_settings (`key`, `value`) VALUES 
+('session.reconnect.grace.seconds', '5');
+
+INSERT INTO emulator_settings (`key`, `value`) VALUES 
+('session.reconnect.effect.id', '188');
+
 -- Camera emulator texts
 INSERT IGNORE INTO `emulator_texts` (`key`, `value`) VALUES
 ('camera.permission', 'You do not have permission to use the camera.');
