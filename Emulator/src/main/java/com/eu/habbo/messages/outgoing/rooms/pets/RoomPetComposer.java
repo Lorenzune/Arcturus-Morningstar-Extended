@@ -62,6 +62,7 @@ public class RoomPetComposer extends MessageComposer implements TIntObjectProced
         this.response.appendString("");
         this.response.appendString("unknown");
         this.response.appendInt(0);
+        this.response.appendInt(0);
 
         return true;
     }
