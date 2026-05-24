@@ -720,5 +720,6 @@ public class PacketManager {
         // Housekeeping (in-client admin panel)
         this.registerHandler(Incoming.HousekeepingFindUserByNameEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingFindUserByNameEvent.class);
         this.registerHandler(Incoming.HousekeepingFindUserByIdEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingFindUserByIdEvent.class);
+        this.registerHandler(Incoming.HousekeepingBanUserEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingBanUserEvent.class);
     }
 }
