@@ -468,4 +468,5 @@ public class Incoming {
     public static final int HousekeepingUnbanUserEvent = 9103;
     public static final int HousekeepingMuteUserEvent = 9104;
     public static final int HousekeepingKickUserEvent = 9105;
+    public static final int HousekeepingForceDisconnectUserEvent = 9106;
 }
