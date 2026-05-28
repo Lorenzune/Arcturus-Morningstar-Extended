@@ -6,7 +6,7 @@
 
     <groupId>com.eu.habbo</groupId>
     <artifactId>Habbo</artifactId>
-    <version>4.2.12</version>
+    <version>4.2.24</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,6 +38,7 @@
                     <archive>
                         <manifest>
                             <mainClass>com.eu.habbo.Emulator</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>
