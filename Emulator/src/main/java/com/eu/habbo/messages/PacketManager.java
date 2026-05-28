@@ -745,5 +745,13 @@ public class PacketManager {
         this.registerHandler(Incoming.HousekeepingSendHotelAlertEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingSendHotelAlertEvent.class);
         this.registerHandler(Incoming.HousekeepingGetDashboardEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingGetDashboardEvent.class);
         this.registerHandler(Incoming.HousekeepingListActionLogEvent, com.eu.habbo.messages.incoming.housekeeping.HousekeepingListActionLogEvent.class);
+
+        this.registerHandler(Incoming.RequestRareValuesEvent, com.eu.habbo.messages.incoming.rarevalues.RequestRareValuesEvent.class);
+
+        this.registerHandler(Incoming.WheelOpenEvent, com.eu.habbo.messages.incoming.wheel.WheelOpenEvent.class);
+        this.registerHandler(Incoming.WheelSpinEvent, com.eu.habbo.messages.incoming.wheel.WheelSpinEvent.class);
+        this.registerHandler(Incoming.WheelBuySpinEvent, com.eu.habbo.messages.incoming.wheel.WheelBuySpinEvent.class);
+        this.registerHandler(Incoming.WheelAdminGetPrizesEvent, com.eu.habbo.messages.incoming.wheel.WheelAdminGetPrizesEvent.class);
+        this.registerHandler(Incoming.WheelAdminSavePrizesEvent, com.eu.habbo.messages.incoming.wheel.WheelAdminSavePrizesEvent.class);
     }
 }

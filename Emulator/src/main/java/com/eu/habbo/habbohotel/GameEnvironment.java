@@ -6,6 +6,7 @@ import com.eu.habbo.habbohotel.achievements.AchievementManager;
 import com.eu.habbo.habbohotel.bots.BotManager;
 import com.eu.habbo.habbohotel.campaign.calendar.CalendarManager;
 import com.eu.habbo.habbohotel.catalog.CatalogManager;
+import com.eu.habbo.habbohotel.wheel.WheelManager;
 import com.eu.habbo.habbohotel.commands.CommandHandler;
 import com.eu.habbo.habbohotel.crafting.CraftingManager;
 import com.eu.habbo.habbohotel.guides.GuideManager;
@@ -64,6 +65,7 @@ public class GameEnvironment {
     private GoogleTranslateManager googleTranslateManager;
     private CustomBadgeManager customBadgeManager;
     private InfostandBackgroundManager infostandBackgroundManager;
+    private WheelManager wheelManager;
 
     public void load() throws Exception {
         LOGGER.info("GameEnvironment -> Loading...");
@@ -93,6 +95,7 @@ public class GameEnvironment {
         this.googleTranslateManager = new GoogleTranslateManager();
         this.customBadgeManager = new CustomBadgeManager();
         this.infostandBackgroundManager = new InfostandBackgroundManager();
+        this.wheelManager = new WheelManager();
 
         this.roomManager.loadPublicRooms();
         this.navigatorManager.loadNavigator();
@@ -154,6 +157,10 @@ public class GameEnvironment {
 
     public CatalogManager getCatalogManager() {
         return this.catalogManager;
+    }
+
+    public WheelManager getWheelManager() {
+        return this.wheelManager;
     }
 
     public HotelViewManager getHotelViewManager() {
