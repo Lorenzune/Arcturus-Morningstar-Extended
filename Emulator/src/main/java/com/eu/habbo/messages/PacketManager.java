@@ -429,6 +429,7 @@ public class PacketManager {
     void registerRooms() throws Exception {
         this.registerHandler(Incoming.RequestMentionsEvent, RequestMentionsEvent.class);
         this.registerHandler(Incoming.MarkMentionsReadEvent, MarkMentionsReadEvent.class);
+        this.registerHandler(Incoming.DeleteMentionEvent, DeleteMentionEvent.class);
         this.registerHandler(Incoming.RequestRoomLoadEvent, RequestRoomLoadEvent.class);
         this.registerHandler(Incoming.RequestHeightmapEvent, RequestRoomHeightmapEvent.class);
         this.registerHandler(Incoming.RequestRoomHeightmapEvent, RequestRoomHeightmapEvent.class);

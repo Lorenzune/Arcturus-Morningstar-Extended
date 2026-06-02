@@ -65,26 +65,24 @@ public class MentionManager {
 
             Set<String> aliases = this.roomAliases();
             boolean roomBroadcast = false;
-            LinkedHashSet<String> directNicks = new LinkedHashSet<>();
+            LinkedHashSet<String> directTokens = new LinkedHashSet<>();
 
             for (String token : message.split("\\s+")) {
                 if (token.length() < 2 || token.charAt(0) != '@') {
                     continue;
                 }
 
-                String nick = token.substring(1).replaceAll("[^A-Za-z0-9_]", "").toLowerCase();
-                if (nick.isEmpty()) {
-                    continue;
-                }
+                String raw = token.substring(1);
+                String aliasCandidate = trimTrailingPunctuation(raw).toLowerCase();
 
-                if (aliases.contains(nick)) {
+                if (!aliasCandidate.isEmpty() && aliases.contains(aliasCandidate)) {
                     roomBroadcast = true;
-                } else {
-                    directNicks.add(nick);
+                } else if (!raw.isEmpty()) {
+                    directTokens.add(raw);
                 }
             }
 
-            if (!roomBroadcast && directNicks.isEmpty()) {
+            if (!roomBroadcast && directTokens.isEmpty()) {
                 return;
             }
 
@@ -106,8 +104,8 @@ public class MentionManager {
                     }
                 }
             } else {
-                for (String nick : directNicks) {
-                    Habbo habbo = room.getHabbo(nick);
+                for (String token : directTokens) {
+                    Habbo habbo = this.resolveHabbo(room, token);
                     if (habbo == null || habbo.getHabboInfo().getId() == senderId) {
                         continue;
                     }
@@ -207,5 +205,45 @@ public class MentionManager {
         } catch (SQLException e) {
             LOGGER.error("Failed to mark mentions as read.", e);
         }
+    }
+
+    public void delete(int userId, int mentionId) {
+        try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "DELETE FROM habbo_mentions WHERE target_user_id = ? AND id = ?")) {
+            statement.setInt(1, userId);
+            statement.setInt(2, mentionId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to delete mention.", e);
+        }
+    }
+
+    private static final String TRAILING_PUNCTUATION = ".,!?;:)]}\"'";
+
+    private static String trimTrailingPunctuation(String value) {
+        int end = value.length();
+        while (end > 0 && TRAILING_PUNCTUATION.indexOf(value.charAt(end - 1)) >= 0) {
+            end--;
+        }
+        return value.substring(0, end);
+    }
+
+    /**
+     * Resolve a present room occupant from a raw mention token. Tries the token
+     * verbatim first (so usernames containing allowed punctuation such as '-',
+     * '.', '!' still match), then falls back to a trailing-punctuation-trimmed
+     * form so a mention written as "@Bob!" still resolves the user "Bob".
+     */
+    private Habbo resolveHabbo(Room room, String rawToken) {
+        Habbo habbo = room.getHabbo(rawToken);
+        if (habbo != null) {
+            return habbo;
+        }
+        String trimmed = trimTrailingPunctuation(rawToken);
+        if (!trimmed.isEmpty() && !trimmed.equals(rawToken)) {
+            return room.getHabbo(trimmed);
+        }
+        return null;
     }
 }

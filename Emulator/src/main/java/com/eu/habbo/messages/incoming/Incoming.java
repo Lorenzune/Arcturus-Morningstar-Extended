@@ -498,4 +498,5 @@ public class Incoming {
     public static final int SoundboardSetEnabledEvent = 9307;
     public static final int RequestMentionsEvent = 4803;
     public static final int MarkMentionsReadEvent = 4804;
+    public static final int DeleteMentionEvent = 4805;
 }
