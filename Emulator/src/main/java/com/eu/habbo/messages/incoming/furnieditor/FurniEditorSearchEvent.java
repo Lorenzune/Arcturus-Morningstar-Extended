@@ -27,6 +27,8 @@ public class FurniEditorSearchEvent extends MessageHandler {
         String query = this.packet.readString();
         String type = this.packet.readString();
         int page = this.packet.readInt();
+        String sortField = this.packet.readString();
+        String sortDir = this.packet.readString();
 
         // Input validation
         if (query.length() > 100) {
@@ -64,10 +66,53 @@ public class FurniEditorSearchEvent extends MessageHandler {
             params.add(type);
         }
 
+        // Extend search with furnidata display-name matches (server-authoritative names in JSON).
+        // Appends: OR (LOWER(item_name) IN (?,?,...) [AND type=?])
+        // Both branches carry their own type filter, so type scoping is preserved.
+        // Params: [existing LIKE params] [existing type?] [furniCns...] [type again?]
+        if (!query.isEmpty()) {
+            java.util.List<String> furniCns = Emulator.getGameEnvironment()
+                    .getFurnitureTextProvider()
+                    .findClassnamesByName(query);
+            if (!furniCns.isEmpty()) {
+                // Build: OR (LOWER(item_name) IN (?,?,...) [AND type = ?])
+                StringBuilder orBranch = new StringBuilder(" OR (LOWER(item_name) IN (");
+                for (int i = 0; i < furniCns.size(); i++) {
+                    if (i > 0) orBranch.append(", ");
+                    orBranch.append('?');
+                }
+                orBranch.append(')');
+                if (type != null && !type.isEmpty()) {
+                    orBranch.append(" AND type = ?");
+                }
+                orBranch.append(')');
+                whereClause.append(orBranch);
+                params.addAll(furniCns);
+                if (type != null && !type.isEmpty()) {
+                    params.add(type);
+                }
+            }
+        }
+
+        // Resolve a SAFE ORDER BY from the whitelisted sort field/direction
+        // (column names are never taken from raw user input — injection-proof).
+        String orderColumn;
+        switch (sortField == null ? "" : sortField) {
+            case "spriteId":        orderColumn = "sprite_id"; break;
+            case "itemName":        orderColumn = "item_name"; break;
+            case "publicName":      orderColumn = "public_name"; break;
+            case "type":            orderColumn = "type"; break;
+            case "interactionType": orderColumn = "interaction_type"; break;
+            case "id":
+            default:                orderColumn = "id"; break;
+        }
+        String orderDir = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+
         // Count total
         int total = 0;
         String countSql = "SELECT COUNT(*) FROM items_base " + whereClause;
-        String dataSql = "SELECT * FROM items_base " + whereClause + " ORDER BY id ASC LIMIT ? OFFSET ?";
+        String dataSql = "SELECT * FROM items_base " + whereClause
+                + " ORDER BY " + orderColumn + " " + orderDir + ", id ASC LIMIT ? OFFSET ?";
 
         List<Map<String, Object>> items = new ArrayList<>();
 
