@@ -174,6 +174,8 @@ public class BotSaveSettingsEvent extends MessageHandler {
                     int next = (bot.getRoomUnit().getBodyRotation().getValue() + 2) % 8;
                     RoomUserRotation rotation = RoomUserRotation.fromValue(next);
                     bot.getRoomUnit().setRotation(rotation);
+                    bot.getRoomUnit().setPreviousLocation(bot.getRoomUnit().getCurrentLocation());
+                    bot.getRoomUnit().setPreviousLocationZ(bot.getRoomUnit().getZ());
                     bot.needsUpdate(true);
                     room.sendComposer(new RoomUserStatusComposer(bot.getRoomUnit()).compose());
                     break;

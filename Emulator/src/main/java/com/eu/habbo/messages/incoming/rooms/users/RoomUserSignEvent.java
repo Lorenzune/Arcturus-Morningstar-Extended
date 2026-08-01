@@ -1,6 +1,7 @@
 package com.eu.habbo.messages.incoming.rooms.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.items.interactions.InteractionVoteCounter;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomUnitStatus;
@@ -31,6 +32,9 @@ public class RoomUserSignEvent extends MessageHandler {
             this.client.getHabbo().getRoomUnit().setStatus(RoomUnitStatus.SIGN, event.sign + "");
             this.client.getHabbo().getHabboInfo().getCurrentRoom().unIdle(this.client.getHabbo());
             WiredManager.triggerUserPerformsAction(room, this.client.getHabbo().getRoomUnit(), WiredUserActionType.SIGN, event.sign);
+            if (event.sign == 10) {
+                DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.SIGN_10, 1);
+            }
 
             int userId = this.client.getHabbo().getHabboInfo().getId();
             for (HabboItem item : room.getRoomSpecialTypes().getItemsOfType(InteractionVoteCounter.class)) {

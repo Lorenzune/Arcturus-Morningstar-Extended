@@ -38,6 +38,8 @@ public class ScratchPetEvent extends MessageHandler {
             List<Runnable> tasks = new ArrayList<>();
             tasks.add(() -> {
                 pet.scratched(habbo);
+                Emulator.getGameEnvironment().getRewardTrackManager()
+                        .addProgress(habbo.getHabboInfo().getId(), "scratch_pet", 1);
                 Emulator.getThreading().run(pet);
             });
 

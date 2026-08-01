@@ -39,6 +39,11 @@ public class RoomUserTalkEvent extends MessageHandler {
 
                 Emulator.getGameEnvironment().getMentionManager()
                     .process(this.client.getHabbo(), room, message.getMessage(), RoomChatType.TALK);
+
+                if (room.getUserCount() > 1) {
+                    Emulator.getGameEnvironment().getRewardTrackManager()
+                            .addProgress(this.client.getHabbo().getHabboInfo().getId(), "chat_with_someone", 1);
+                }
             }
         } else {
             String reportMessage = Emulator.getTexts().getValue("scripter.warning.chat.length").replace("%username%", this.client.getHabbo().getHabboInfo().getUsername()).replace("%length%", message.getMessage().length() + "");

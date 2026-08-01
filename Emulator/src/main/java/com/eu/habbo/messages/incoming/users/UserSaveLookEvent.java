@@ -2,6 +2,7 @@ package com.eu.habbo.messages.incoming.users;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.achievements.AchievementManager;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.modtool.ScripterManager;
 import com.eu.habbo.habbohotel.users.HabboGender;
 import com.eu.habbo.habbohotel.users.clothingvalidation.ClothingValidationManager;
@@ -50,5 +51,6 @@ public class UserSaveLookEvent extends MessageHandler {
         );
 
         AchievementManager.progressAchievement(this.client.getHabbo(), Emulator.getGameEnvironment().getAchievementManager().getAchievement("AvatarLooks"));
+        DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.CHANGE_FIGURE, 1);
     }
 }

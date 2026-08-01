@@ -189,6 +189,7 @@ import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsDelete;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsEvent;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetDelete;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetsEvent;
+import com.eu.habbo.messages.incoming.inventory.nickicons.DeleteNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.PurchaseNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.RequestUserNickIconsEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.SetActiveNickIconEvent;
@@ -858,6 +859,7 @@ public class PacketManager {
         this.registerHandler(Incoming.RequestUserNickIconsEvent, RequestUserNickIconsEvent.class);
         this.registerHandler(Incoming.PurchaseNickIconEvent, PurchaseNickIconEvent.class);
         this.registerHandler(Incoming.SetActiveNickIconEvent, SetActiveNickIconEvent.class);
+        this.registerHandler(Incoming.DeleteNickIconEvent, DeleteNickIconEvent.class);
     }
 
     void registerRooms() throws Exception {

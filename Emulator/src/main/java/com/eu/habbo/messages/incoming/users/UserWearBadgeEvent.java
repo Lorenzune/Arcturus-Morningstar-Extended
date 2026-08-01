@@ -1,6 +1,7 @@
 package com.eu.habbo.messages.incoming.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.users.HabboBadge;
 import com.eu.habbo.habbohotel.users.inventory.BadgesComponent;
 import com.eu.habbo.messages.incoming.MessageHandler;
@@ -44,6 +45,10 @@ public class UserWearBadgeEvent extends MessageHandler {
             this.client.getHabbo().getHabboInfo().getCurrentRoom().sendComposer(new UserBadgesComposer(updatedBadges, this.client.getHabbo().getHabboInfo().getId()).compose());
         } else {
             this.client.sendResponse(new UserBadgesComposer(updatedBadges, this.client.getHabbo().getHabboInfo().getId()));
+        }
+
+        if (!updatedBadges.isEmpty()) {
+            DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.WEAR_BADGE, 1);
         }
     }
 }

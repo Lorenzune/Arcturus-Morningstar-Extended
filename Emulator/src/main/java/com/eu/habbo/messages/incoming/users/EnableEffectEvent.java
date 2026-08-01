@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.incoming.users;
 
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.messages.incoming.MessageHandler;
 
 public class EnableEffectEvent extends MessageHandler {
@@ -10,6 +11,7 @@ public class EnableEffectEvent extends MessageHandler {
         if (effectId > 0) {
             if (this.client.getHabbo().getInventory().getEffectsComponent().ownsEffect(effectId)) {
                 this.client.getHabbo().getInventory().getEffectsComponent().enableEffect(effectId);
+                DailyTaskActionMatcher.addEffectProgress(this.client.getHabbo(), effectId);
             }
         } else {
             this.client.getHabbo().getInventory().getEffectsComponent().activatedEffect = 0;
