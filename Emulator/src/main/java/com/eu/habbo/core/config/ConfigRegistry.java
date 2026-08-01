@@ -158,6 +158,7 @@ public final class ConfigRegistry {
                 "false",
                 true,
                 "db.migrate.on_startup",
+                "db.migrate.out_of_order",
                 "db.migrations.backup.enabled",
                 "enc.enabled",
                 "nitro.secure.assets.enabled",
@@ -216,6 +217,7 @@ public final class ConfigRegistry {
             case "db.password" -> "DB_PASSWORD";
             case "db.params" -> "DB_PARAMS";
             case "db.migrate.on_startup" -> "DB_MIGRATE_ON_STARTUP";
+            case "db.migrate.out_of_order" -> "DB_MIGRATE_OUT_OF_ORDER";
             case "game.host" -> "EMU_HOST";
             case "game.port" -> "EMU_PORT";
             case "rcon.host" -> "RCON_HOST";

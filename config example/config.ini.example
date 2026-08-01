@@ -7,6 +7,8 @@ db.password=root
 db.params=
 # Automatically prepare empty databases and upgrade recognized Arcturus/Polaris hotels.
 db.migrate.on_startup=true
+# Recovery-only: allow applying migrations that were missed behind the current Flyway version.
+db.migrate.out_of_order=false
 # Required fail-closed backup before pending migrations are applied.
 db.migrations.backup.enabled=true
 db.migrations.backup.directory=backups/database

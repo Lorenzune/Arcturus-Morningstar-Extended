@@ -38,6 +38,7 @@ public final class MigrationRunner {
     public static final String BASELINE_VERSION = "20260518000000";
 
     private static final String KEY_ON_STARTUP = "db.migrate.on_startup";
+    private static final String KEY_OUT_OF_ORDER = "db.migrate.out_of_order";
 
     private MigrationRunner() {}
 
@@ -58,7 +59,10 @@ public final class MigrationRunner {
         // The runtime datasource rewrites legacy plugin SQL. Migrations require an
         // unwrapped pool so their DDL cannot be silently translated.
         try (HikariDataSource rawMigrationDataSource = rawMigrationDataSource(runtimeDataSource)) {
-            return migrate(rawMigrationDataSource, MariaDbMigrationBackup.resolve(config, rawMigrationDataSource));
+            return migrate(
+                    rawMigrationDataSource,
+                    MariaDbMigrationBackup.resolve(config, rawMigrationDataSource),
+                    config.getBoolean(KEY_OUT_OF_ORDER, false));
         }
     }
 
@@ -92,8 +96,12 @@ public final class MigrationRunner {
     }
 
     static MigrateResult migrate(DataSource dataSource, MigrationBackup migrationBackup) {
+        return migrate(dataSource, migrationBackup, false);
+    }
+
+    static MigrateResult migrate(DataSource dataSource, MigrationBackup migrationBackup, boolean outOfOrder) {
         SchemaPreflight.State state = SchemaPreflight.detect(dataSource);
-        Flyway flyway = flyway(dataSource);
+        Flyway flyway = flyway(dataSource, outOfOrder);
 
         LOGGER.info("[migrate] Detected schema state: {}", state);
         try {
@@ -237,6 +245,10 @@ public final class MigrationRunner {
 
     /** Package-visible so the contract generator can use the production Flyway configuration. */
     static Flyway flyway(DataSource dataSource) {
+        return flyway(dataSource, false);
+    }
+
+    static Flyway flyway(DataSource dataSource, boolean outOfOrder) {
         return Flyway.configure()
                 .dataSource(dataSource)
                 .locations(MIGRATION_LOCATION)
@@ -244,7 +256,7 @@ public final class MigrationRunner {
                 .baselineVersion(BASELINE_VERSION)
                 .baselineDescription("Existing Arcturus/Polaris installation")
                 .validateOnMigrate(true)
-                .outOfOrder(false)
+                .outOfOrder(outOfOrder)
                 // Reference data contains literal ${...} client template strings.
                 .placeholderReplacement(false)
                 .load();

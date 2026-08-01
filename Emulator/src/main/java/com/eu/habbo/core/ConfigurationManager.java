@@ -87,6 +87,7 @@ public class ConfigurationManager {
             envMapping.put("db.password", "DB_PASSWORD");
             envMapping.put("db.params", "DB_PARAMS");
             envMapping.put("db.migrate.on_startup", "DB_MIGRATE_ON_STARTUP");
+            envMapping.put("db.migrate.out_of_order", "DB_MIGRATE_OUT_OF_ORDER");
 
             // Game Configuration
             envMapping.put("game.host", "EMU_HOST");

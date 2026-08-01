@@ -13,6 +13,7 @@ Unknown keys remain allowed for plugins. Database-backed hotel settings are docu
 | `db.integrity.audit.query_timeout_seconds` | integer | `0` | — | yes | no | Startup integrity-audit setting. |
 | `db.integrity.audit.sample_limit` | integer | `0` | — | yes | no | Startup integrity-audit setting. |
 | `db.migrate.on_startup` | boolean | `false` | `DB_MIGRATE_ON_STARTUP` | yes | no | Database startup setting. |
+| `db.migrate.out_of_order` | boolean | `false` | `DB_MIGRATE_OUT_OF_ORDER` | yes | no | Database startup setting. |
 | `db.migrations.backup.directory` | string | `` | — | yes | no | Migration backup setting. |
 | `db.migrations.backup.enabled` | boolean | `false` | — | yes | no | Migration backup setting. |
 | `db.migrations.backup.executable` | string | `` | — | yes | no | Migration backup setting. |
