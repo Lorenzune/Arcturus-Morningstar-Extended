@@ -2,6 +2,7 @@ package com.eu.habbo.messages.incoming.users;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.achievements.AchievementManager;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.messages.incoming.MessageHandler;
 import com.eu.habbo.messages.outgoing.rooms.users.RoomUserDataComposer;
 import com.eu.habbo.plugin.events.users.UserSavedMottoEvent;
@@ -27,5 +28,6 @@ public class SaveMottoEvent extends MessageHandler {
         }
 
         AchievementManager.progressAchievement(this.client.getHabbo(), Emulator.getGameEnvironment().getAchievementManager().getAchievement("Motto"));
+        DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.CHANGE_MOTTO, 1);
     }
 }

@@ -87,6 +87,12 @@ public class NickIconsComponent {
         }
     }
 
+    public void removeNickIcon(UserNickIcon nickIcon) {
+        synchronized (this.nickIcons) {
+            this.nickIcons.remove(nickIcon);
+        }
+    }
+
     public void setActive(int nickIconId) {
         synchronized (this.nickIcons) {
             for (UserNickIcon nickIcon : this.nickIcons) {

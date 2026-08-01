@@ -11,6 +11,7 @@ import com.eu.habbo.habbohotel.campaign.calendar.CalendarManager;
 import com.eu.habbo.habbohotel.catalog.CatalogManager;
 import com.eu.habbo.habbohotel.commands.CommandHandler;
 import com.eu.habbo.habbohotel.crafting.CraftingManager;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskManager;
 import com.eu.habbo.habbohotel.guides.GuideManager;
 import com.eu.habbo.habbohotel.guilds.GuildManager;
 import com.eu.habbo.habbohotel.hotelview.HotelViewManager;
@@ -24,6 +25,7 @@ import com.eu.habbo.habbohotel.navigation.NavigatorManager;
 import com.eu.habbo.habbohotel.permissions.PermissionsManager;
 import com.eu.habbo.habbohotel.pets.PetManager;
 import com.eu.habbo.habbohotel.polls.PollManager;
+import com.eu.habbo.habbohotel.rewardtrack.RewardTrackManager;
 import com.eu.habbo.habbohotel.rooms.RoomChatBubbleManager;
 import com.eu.habbo.habbohotel.rooms.RoomManager;
 import com.eu.habbo.habbohotel.soundboard.SoundboardManager;
@@ -79,6 +81,8 @@ public class GameEnvironment {
     private GoogleTranslateManager googleTranslateManager;
     private CustomBadgeManager customBadgeManager;
     private InfostandBackgroundManager infostandBackgroundManager;
+    private RewardTrackManager rewardTrackManager;
+    private DailyTaskManager dailyTaskManager;
     private WheelManager wheelManager;
     private SoundboardManager soundboardManager;
     private TraxEditorManager traxEditorManager;
@@ -128,6 +132,8 @@ public class GameEnvironment {
         this.customBadgeManager = this.services.create("custom badge manager", CustomBadgeManager::new);
         this.infostandBackgroundManager =
                 this.services.create("infostand backgrounds", InfostandBackgroundManager::new);
+        this.rewardTrackManager = this.services.create("reward track manager", RewardTrackManager::new);
+        this.dailyTaskManager = this.services.create("daily task manager", DailyTaskManager::new);
         this.wheelManager = this.services.create("wheel manager", WheelManager::new);
         this.soundboardManager = this.services.create("soundboard manager", SoundboardManager::new);
         this.traxEditorManager = this.services.create("trax editor manager", TraxEditorManager::new);
@@ -297,6 +303,14 @@ public class GameEnvironment {
 
     public HotelViewManager getHotelViewManager() {
         return this.hotelViewManager;
+    }
+
+    public RewardTrackManager getRewardTrackManager() {
+        return this.rewardTrackManager;
+    }
+
+    public DailyTaskManager getDailyTaskManager() {
+        return this.dailyTaskManager;
     }
 
     public RoomManager getRoomManager() {

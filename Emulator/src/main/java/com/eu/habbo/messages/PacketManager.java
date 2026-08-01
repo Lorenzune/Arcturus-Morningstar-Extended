@@ -37,8 +37,28 @@ import com.eu.habbo.messages.incoming.guilds.forums.*;
 import com.eu.habbo.messages.incoming.handshake.*;
 import com.eu.habbo.messages.incoming.helper.MySanctionStatusEvent;
 import com.eu.habbo.messages.incoming.helper.RequestTalentTrackEvent;
-import com.eu.habbo.messages.incoming.hotelview.*;
-import com.eu.habbo.messages.incoming.inventory.*;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewClaimBadgeRewardEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewDataEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewLandingRequestEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewLandingResetVotesEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewLandingSaveEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewLandingSaveSceneEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewLandingVoteEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewRequestBadgeRewardEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewRequestBonusRareEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewRequestLTDAvailabilityEvent;
+import com.eu.habbo.messages.incoming.hotelview.HotelViewRequestSecondsUntilEvent;
+import com.eu.habbo.messages.incoming.hotelview.RequestNewsListEvent;
+import com.eu.habbo.messages.incoming.inventory.HotelViewInventoryEvent;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryBadgeDelete;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryBadgesEvent;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryBotsEvent;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsDelete;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsEvent;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetDelete;
+import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetsEvent;
+import com.eu.habbo.messages.incoming.inventory.nickicons.DeleteNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.PurchaseNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.RequestUserNickIconsEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.SetActiveNickIconEvent;
@@ -500,6 +520,7 @@ public class PacketManager {
         this.registerHandler(Incoming.RequestUserNickIconsEvent, RequestUserNickIconsEvent.class);
         this.registerHandler(Incoming.PurchaseNickIconEvent, PurchaseNickIconEvent.class);
         this.registerHandler(Incoming.SetActiveNickIconEvent, SetActiveNickIconEvent.class);
+        this.registerHandler(Incoming.DeleteNickIconEvent, DeleteNickIconEvent.class);
     }
 
     void registerRooms() throws Exception {

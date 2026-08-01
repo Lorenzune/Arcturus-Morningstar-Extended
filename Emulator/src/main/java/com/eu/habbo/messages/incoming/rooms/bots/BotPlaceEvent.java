@@ -13,14 +13,22 @@ public class BotPlaceEvent extends MessageHandler {
         if (room == null)
             return;
 
-        Bot bot = this.client.getHabbo().getInventory().getBotsComponent().getBot(this.packet.readInt());
+        int botId = Math.abs(this.packet.readInt());
+
+        int x = this.packet.readInt();
+        int y = this.packet.readInt();
+        Bot bot = this.client.getHabbo().getInventory().getBotsComponent().getBot(botId);
+
+        if (bot != null) {
+            Emulator.getGameEnvironment().getBotManager().placeBot(bot, this.client.getHabbo(), room, room.getLayout().getTile((short) x, (short) y));
+            return;
+        }
+
+        bot = room.getBot(botId);
 
         if (bot == null)
             return;
 
-        int x = this.packet.readInt();
-        int y = this.packet.readInt();
-
-        Emulator.getGameEnvironment().getBotManager().placeBot(bot, this.client.getHabbo(), this.client.getHabbo().getHabboInfo().getCurrentRoom(), room.getLayout().getTile((short) x, (short) y));
+        Emulator.getGameEnvironment().getBotManager().moveBot(bot, this.client.getHabbo(), room, room.getLayout().getTile((short) x, (short) y));
     }
 }

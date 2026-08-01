@@ -2,6 +2,7 @@ package com.eu.habbo.messages.incoming.rooms.items;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.commands.FurniDataCommand;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.items.interactions.InteractionDice;
 import com.eu.habbo.habbohotel.items.interactions.pets.InteractionMonsterPlantSeed;
 import com.eu.habbo.habbohotel.pets.MonsterplantPet;
@@ -152,6 +153,10 @@ public class ToggleFloorItemEvent extends MessageHandler {
             }
 
             item.onClick(this.client, room, new Object[] {state});
+            DailyTaskActionMatcher.addFurniUseProgress(this.client.getHabbo(), item);
+            DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.SWITCH_ITEM_STATE, 1);
+            Emulator.getGameEnvironment().getRewardTrackManager()
+                    .addProgress(this.client.getHabbo().getHabboInfo().getId(), "toggle_floor_item", 1);
         } catch (Exception e) {
             LOGGER.error("Caught exception", e);
         }

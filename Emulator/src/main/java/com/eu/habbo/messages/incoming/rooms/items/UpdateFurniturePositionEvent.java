@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.incoming.rooms.items;
 
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.rooms.FurnitureMovementError;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
@@ -42,6 +43,7 @@ public class UpdateFurniturePositionEvent extends MessageHandler {
 
         RoomTile oldTile = room.getLayout().getTile(item.getX(), item.getY());
         double oldZ = item.getZ();
+        int oldRotation = item.getRotation();
 
         error = room.moveFurniTo(item, tile, rotation, z, this.client.getHabbo(), false, true);
         if (error != FurnitureMovementError.NONE) {
@@ -51,6 +53,13 @@ public class UpdateFurniturePositionEvent extends MessageHandler {
         }
 
         if (oldTile != null) {
+            if (oldTile.x != tile.x || oldTile.y != tile.y || Double.compare(oldZ, item.getZ()) != 0) {
+                DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.MOVE_ITEM, 1);
+            }
+            if (oldRotation != item.getRotation()) {
+                DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.ROTATE_ITEM, 1);
+            }
+
             List<WiredMovementsComposer.MovementData> movements = new ArrayList<>(1);
             movements.add(WiredMovementsComposer.furniMovement(
                     item.getId(),

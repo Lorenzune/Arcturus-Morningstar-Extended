@@ -1,6 +1,7 @@
 package com.eu.habbo.messages.incoming.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.messages.incoming.MessageHandler;
@@ -14,6 +15,7 @@ public class ActivateEffectEvent extends MessageHandler {
 
         if (habbo.getInventory().getEffectsComponent().ownsEffect(effectId)) {
             habbo.getInventory().getEffectsComponent().activateEffect(effectId);
+            DailyTaskActionMatcher.addEffectProgress(habbo, effectId);
             return;
         }
 
@@ -26,5 +28,6 @@ public class ActivateEffectEvent extends MessageHandler {
         if (room == null || habbo.getHabboInfo().getRiding() != null) return;
 
         room.giveEffect(habbo, effectId, -1);
+        DailyTaskActionMatcher.addEffectProgress(habbo, effectId);
     }
 }
