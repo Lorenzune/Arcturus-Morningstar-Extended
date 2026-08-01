@@ -6458,6 +6458,22 @@
       "fields": []
     },
     {
+      "name": "SNOWWAR_EXIT_EDITOR",
+      "direction": "client_to_server",
+      "header": 6014,
+      "java": {
+        "symbol": "UNKNOWN_SNOWSTORM_6014",
+        "className": "SnowStormExitEditorEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/snowwar/SnowStormExitEditorEvent.java"
+      },
+      "typescript": {
+        "symbol": "SNOWWAR_EXIT_EDITOR",
+        "className": "SnowWarExitEditorComposer",
+        "path": "packages/communication/src/messages/outgoing/game/snowwar/SnowWarExitEditorComposer.ts"
+      },
+      "fields": []
+    },
+    {
       "name": "REQUEST_PREFIXES",
       "direction": "client_to_server",
       "header": 7011,
@@ -7818,6 +7834,70 @@
           "kind": "scalar",
           "type": "int",
           "name": "direction"
+        }
+      ]
+    },
+    {
+      "name": "WIRED_FURNI_RUNTIME_STATE_REQUEST",
+      "direction": "client_to_server",
+      "header": 10028,
+      "java": {
+        "symbol": "WiredFurniRuntimeStateRequestEvent",
+        "className": "WiredFurniRuntimeStateRequestEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/wired/WiredFurniRuntimeStateRequestEvent.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_FURNI_RUNTIME_STATE_REQUEST",
+        "className": "WiredFurniRuntimeStateRequestComposer",
+        "path": "packages/communication/src/messages/outgoing/roomevents/WiredFurniRuntimeStateRequestComposer.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "itemId"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "action"
+        },
+        {
+          "kind": "scalar",
+          "type": "string",
+          "name": "key"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "requestedValue"
+        }
+      ]
+    },
+    {
+      "name": "WIRED_FEATURE_CAPABILITIES",
+      "direction": "client_to_server",
+      "header": 10029,
+      "java": {
+        "symbol": "WiredFeatureCapabilitiesEvent",
+        "className": "WiredFeatureCapabilitiesEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/wired/WiredFeatureCapabilitiesEvent.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_FEATURE_CAPABILITIES",
+        "className": "WiredFeatureCapabilitiesComposer",
+        "path": "packages/communication/src/messages/outgoing/roomevents/WiredFeatureCapabilitiesComposer.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "protocolVersion"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "capabilities"
         }
       ]
     },
@@ -14997,33 +15077,6 @@
       ]
     },
     {
-      "name": "SNOWWAR_GAMES_INFORMATION",
-      "direction": "server_to_client",
-      "header": 5012,
-      "java": {
-        "symbol": "SnowStormGamesInformationComposer",
-        "className": "SnowStormGamesInformationComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/snowwar/SnowStormGamesInformationComposer.java"
-      },
-      "typescript": {
-        "symbol": "SNOWWAR_GAMES_INFORMATION",
-        "className": "SnowWarGamesInformationParser",
-        "path": "packages/communication/src/messages/parser/game/snowwar/SnowWarGamesInformationParser.ts"
-      },
-      "fields": [
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        }
-      ]
-    },
-    {
       "name": "SNOWWAR_ON_STAGE_START",
       "direction": "server_to_client",
       "header": 5017,
@@ -15308,6 +15361,48 @@
         {
           "kind": "scalar",
           "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "name": "WIRED_FURNI_RUNTIME_STATE",
+      "direction": "server_to_client",
+      "header": 5108,
+      "java": {
+        "symbol": "WiredFurniRuntimeStateComposer",
+        "className": "WiredFurniRuntimeStateComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/wired/WiredFurniRuntimeStateComposer.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_FURNI_RUNTIME_STATE",
+        "className": "WiredFurniRuntimeStateParser",
+        "path": "packages/communication/src/messages/parser/roomevents/WiredFurniRuntimeStateParser.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": ""
+        },
+        {
+          "kind": "scalar",
+          "type": "string",
+          "name": ""
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": ""
+        },
+        {
+          "kind": "scalar",
+          "type": "boolean",
+          "name": ""
+        },
+        {
+          "kind": "scalar",
+          "type": "boolean",
           "name": ""
         }
       ]
@@ -16035,14 +16130,6 @@
     {
       "direction": "server_to_client",
       "side": "java",
-      "header": 6002,
-      "symbol": "WiredFurniOpacityComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/items/WiredFurniOpacityComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
       "header": 9409,
       "symbol": "HotelViewLandingComposer",
       "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/hotelview/HotelViewLandingComposer.java",
@@ -16054,14 +16141,6 @@
       "header": 9410,
       "symbol": "RoomUserHabbiconComposer",
       "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/users/RoomUserHabbiconComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 9415,
-      "symbol": "WiredFurniGravityComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/items/WiredFurniGravityComposer.java",
       "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
@@ -18665,6 +18744,38 @@
         "path": "packages/communication/src/messages/outgoing/handshake/ClientHelloMessageComposer.ts"
       },
       "reason": "TypeScript analyzer: Outgoing value `NITRO-${NitroVersion.RENDERER_VERSION.replaceAll(\u0027.\u0027, \u0027-\u0027)}` has no statically resolvable wire type"
+    },
+    {
+      "name": "SNOWWAR_LOBBY_TEAMS",
+      "direction": "server_to_client",
+      "header": 5007,
+      "java": {
+        "symbol": "SnowStormLobbyTeamsComposer",
+        "className": "SnowStormLobbyTeamsComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/snowwar/SnowStormLobbyTeamsComposer.java"
+      },
+      "typescript": {
+        "symbol": "SNOWWAR_LOBBY_TEAMS",
+        "className": "SnowWarLobbyTeamsParser",
+        "path": "packages/communication/src/messages/parser/game/snowwar/SnowWarLobbyTeamsParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForStmt inside composeInternal (per-player roster loop)"
+    },
+    {
+      "name": "SNOWWAR_GAMES_INFORMATION",
+      "direction": "server_to_client",
+      "header": 5012,
+      "java": {
+        "symbol": "SnowStormGamesInformationComposer",
+        "className": "SnowStormGamesInformationComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/snowwar/SnowStormGamesInformationComposer.java"
+      },
+      "typescript": {
+        "symbol": "SNOWWAR_GAMES_INFORMATION",
+        "className": "SnowWarGamesInformationParser",
+        "path": "packages/communication/src/messages/parser/game/snowwar/SnowWarGamesInformationParser.ts"
+      },
+      "reason": "Java composer appends the trailing min-players int and can-edit boolean unconditionally; TypeScript parser reads them as an optional bytesAvailable-gated tail for older servers"
     },
     {
       "name": "SNOWWAR_SAVE_EDITOR",
@@ -22153,6 +22264,38 @@
         "path": "packages/communication/src/messages/parser/translation/TranslationLanguagesParser.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
+      "name": "WIRED_FURNI_OPACITY",
+      "direction": "server_to_client",
+      "header": 5109,
+      "java": {
+        "symbol": "WiredFurniOpacityComposer",
+        "className": "WiredFurniOpacityComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/WiredFurniOpacityComposer.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_FURNI_OPACITY",
+        "className": "WiredFurniOpacityParser",
+        "path": "packages/communication/src/messages/parser/roomevents/WiredFurniOpacityParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
+      "name": "WIRED_FURNI_MOVE_STYLE",
+      "direction": "server_to_client",
+      "header": 5110,
+      "java": {
+        "symbol": "WiredFurniMoveStyleComposer",
+        "className": "WiredFurniMoveStyleComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/WiredFurniMoveStyleComposer.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_FURNI_MOVE_STYLE",
+        "className": "WiredFurniMoveStyleParser",
+        "path": "packages/communication/src/messages/parser/roomevents/WiredFurniMoveStyleParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
     },
     {
       "name": "AREA_HIDE",

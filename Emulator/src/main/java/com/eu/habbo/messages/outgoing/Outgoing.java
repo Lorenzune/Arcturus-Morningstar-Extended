@@ -133,8 +133,6 @@ public class Outgoing {
     public static final int TranslationLanguagesComposer = 5106; // CUSTOM
     public static final int TranslationResultComposer = 5107; // CUSTOM
     public static final int AreaHideComposer = 6001; // CUSTOM
-    public static final int WiredFurniOpacityComposer = 6002; // CUSTOM
-    public static final int WiredFurniGravityComposer = 9415; // CUSTOM
     public static final int RoomPaintComposer = 2454; // PRODUCTION-201611291003-338511768
     public static final int MarketplaceConfigComposer = 1823; // PRODUCTION-201611291003-338511768
     public static final int AddBotComposer = 1352; // PRODUCTION-201611291003-338511768
@@ -545,6 +543,7 @@ public class Outgoing {
     public static final int SnowStormUnusedAlertGenericComposer = 5004;
     public static final int SnowStormLongDataComposer = 5005;
     public static final int SnowStormGameEndedComposer = 5006;
+    public static final int SnowStormLobbyTeamsComposer = 5007;
     public static final int SnowStormQuePlayerAddedComposer = 5008;
     public static final int SnowStormPlayAgainComposer = 5009;
     public static final int SnowStormGamesLeftComposer = 5010;
