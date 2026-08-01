@@ -82,7 +82,7 @@ U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getDatabase|2
 U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getGameEnvironment|2
 U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getPluginManager|2
 U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getTexts|1
-U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getThreading|2
+U|com/eu/habbo/habbohotel/bots/BotManager.java|CALL|getThreading|3
 U|com/eu/habbo/habbohotel/bots/ButlerBot.java|CALL|getConfig|4
 U|com/eu/habbo/habbohotel/bots/ButlerBot.java|CALL|getDatabase|1
 U|com/eu/habbo/habbohotel/bots/ButlerBot.java|CALL|getPluginManager|1
@@ -1354,6 +1354,7 @@ U|com/eu/habbo/messages/incoming/housekeeping/HousekeepingTransferRoomOwnershipE
 U|com/eu/habbo/messages/incoming/housekeeping/HousekeepingUnbanUserEvent.java|CALL|getGameEnvironment|2
 U|com/eu/habbo/messages/incoming/inventory/RequestInventoryItemsDelete.java|CALL|getThreading|1
 U|com/eu/habbo/messages/incoming/inventory/RequestInventoryPetDelete.java|CALL|getGameEnvironment|1
+U|com/eu/habbo/messages/incoming/inventory/nickicons/DeleteNickIconEvent.java|CALL|getThreading|1
 U|com/eu/habbo/messages/incoming/inventory/nickicons/PurchaseNickIconEvent.java|CALL|getDatabase|1
 U|com/eu/habbo/messages/incoming/inventory/prefixes/DeletePrefixEvent.java|CALL|getThreading|1
 U|com/eu/habbo/messages/incoming/inventory/prefixes/PurchaseCatalogPrefixEvent.java|CALL|getDatabase|1
