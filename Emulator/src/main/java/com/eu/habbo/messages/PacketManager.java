@@ -189,6 +189,7 @@ import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsDelete;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryItemsEvent;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetDelete;
 import com.eu.habbo.messages.incoming.inventory.RequestInventoryPetsEvent;
+import com.eu.habbo.messages.incoming.inventory.nickicons.DeleteNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.PurchaseNickIconEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.RequestUserNickIconsEvent;
 import com.eu.habbo.messages.incoming.inventory.nickicons.SetActiveNickIconEvent;
@@ -337,6 +338,7 @@ import com.eu.habbo.messages.incoming.rooms.items.rentablespace.RentSpaceEvent;
 import com.eu.habbo.messages.incoming.rooms.items.youtube.YoutubeRequestPlaylistChange;
 import com.eu.habbo.messages.incoming.rooms.items.youtube.YoutubeRequestPlaylists;
 import com.eu.habbo.messages.incoming.rooms.items.youtube.YoutubeRequestStateChange;
+import com.eu.habbo.messages.incoming.rooms.items.youtube.EmbeddedMediaControlEvent;
 import com.eu.habbo.messages.incoming.rooms.pets.BreedMonsterplantsEvent;
 import com.eu.habbo.messages.incoming.rooms.pets.CompostMonsterplantEvent;
 import com.eu.habbo.messages.incoming.rooms.pets.ConfirmPetBreedingEvent;
@@ -858,6 +860,7 @@ public class PacketManager {
         this.registerHandler(Incoming.RequestUserNickIconsEvent, RequestUserNickIconsEvent.class);
         this.registerHandler(Incoming.PurchaseNickIconEvent, PurchaseNickIconEvent.class);
         this.registerHandler(Incoming.SetActiveNickIconEvent, SetActiveNickIconEvent.class);
+        this.registerHandler(Incoming.DeleteNickIconEvent, DeleteNickIconEvent.class);
     }
 
     void registerRooms() throws Exception {
@@ -969,6 +972,7 @@ public class PacketManager {
         this.registerHandler(Incoming.YoutubeRequestPlaylists, YoutubeRequestPlaylists.class);
         this.registerHandler(Incoming.YoutubeRequestStateChange, YoutubeRequestStateChange.class);
         this.registerHandler(Incoming.YoutubeRequestPlaylistChange, YoutubeRequestPlaylistChange.class);
+        this.registerHandler(Incoming.EmbeddedMediaControlEvent, EmbeddedMediaControlEvent.class);
         this.registerHandler(Incoming.RoomFavoriteEvent, RoomFavoriteEvent.class);
         this.registerHandler(Incoming.LoveLockStartConfirmEvent, LoveLockStartConfirmEvent.class);
         this.registerHandler(Incoming.RoomUnFavoriteEvent, RoomUnFavoriteEvent.class);

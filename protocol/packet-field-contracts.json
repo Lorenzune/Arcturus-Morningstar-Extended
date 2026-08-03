@@ -6664,6 +6664,28 @@
       ]
     },
     {
+      "name": "DELETE_NICK_ICON",
+      "direction": "client_to_server",
+      "header": 7020,
+      "java": {
+        "symbol": "DeleteNickIconEvent",
+        "className": "DeleteNickIconEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/inventory/nickicons/DeleteNickIconEvent.java"
+      },
+      "typescript": {
+        "symbol": "DELETE_NICK_ICON",
+        "className": "DeleteNickIconComposer",
+        "path": "packages/communication/src/messages/outgoing/inventory/nickicons/DeleteNickIconComposer.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "nickIconId"
+        }
+      ]
+    },
+    {
       "name": "HOUSEKEEPING_FIND_USER_BY_NAME",
       "direction": "client_to_server",
       "header": 9100,
@@ -15787,6 +15809,95 @@
           "kind": "scalar",
           "type": "boolean",
           "name": ""
+        }
+      ]
+    },
+    {
+      "name": "EMBEDDED_MEDIA_CONTROL",
+      "direction": "client_to_server",
+      "header": 8004,
+      "java": {
+        "symbol": "EmbeddedMediaControlEvent",
+        "className": "EmbeddedMediaControlEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/rooms/items/youtube/EmbeddedMediaControlEvent.java"
+      },
+      "typescript": {
+        "symbol": "EMBEDDED_MEDIA_CONTROL",
+        "className": "EmbeddedMediaControlComposer",
+        "path": "packages/communication/src/messages/outgoing/room/youtube/EmbeddedMediaControlComposer.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "furniId"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "action"
+        },
+        {
+          "kind": "scalar",
+          "type": "string",
+          "name": "url"
+        }
+      ]
+    },
+    {
+      "name": "EMBEDDED_MEDIA_STATE",
+      "direction": "server_to_client",
+      "header": 8004,
+      "java": {
+        "symbol": "EmbeddedMediaStateComposer",
+        "className": "EmbeddedMediaStateComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/youtube/EmbeddedMediaStateComposer.java"
+      },
+      "typescript": {
+        "symbol": "EMBEDDED_MEDIA_STATE",
+        "className": "EmbeddedMediaStateParser",
+        "path": "packages/communication/src/messages/parser/room/youtube/EmbeddedMediaStateParser.ts"
+      },
+      "fields": [
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "furniId"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "action"
+        },
+        {
+          "kind": "scalar",
+          "type": "string",
+          "name": "url"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "state"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "startedAt"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "offset"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "revision"
+        },
+        {
+          "kind": "scalar",
+          "type": "int",
+          "name": "broadcasterId"
         }
       ]
     }

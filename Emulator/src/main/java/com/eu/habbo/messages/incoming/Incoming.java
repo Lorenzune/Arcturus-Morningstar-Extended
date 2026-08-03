@@ -474,11 +474,13 @@ public class Incoming {
     public static final int SetActiveNickIconEvent = 7017;
     public static final int PurchaseCatalogPrefixEvent = 7018;
     public static final int SetDisplayOrderEvent = 7019;
+    public static final int DeleteNickIconEvent = 7020;
 
     // YouTube Room Broadcast
     public static final int YouTubeRoomPlayEvent = 8001;
     public static final int YouTubeRoomWatchingEvent = 8002;
     public static final int YouTubeRoomSettingsEvent = 8003;
+    public static final int EmbeddedMediaControlEvent = 8004;
 
     // Housekeeping (in-client admin panel) — IDs 9100..9199 reserved
     public static final int HousekeepingFindUserByNameEvent = 9100;

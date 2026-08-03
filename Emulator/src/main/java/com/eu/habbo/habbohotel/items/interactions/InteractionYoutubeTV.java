@@ -9,6 +9,7 @@ import com.eu.habbo.habbohotel.rooms.RoomUnit;
 import com.eu.habbo.habbohotel.users.HabboItem;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.rooms.items.youtube.YoutubeVideoComposer;
+import com.eu.habbo.messages.outgoing.rooms.youtube.EmbeddedMediaStateComposer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,13 +22,86 @@ public class InteractionYoutubeTV extends HabboItem {
     public int offset = 0;
     public boolean playing = true;
     public ScheduledFuture<?> autoAdvance = null;
+    private String embeddedUrl = "";
+    private int embeddedState = 0;
+    private int embeddedStartedAt = 0;
+    private int embeddedOffset = 0;
+    private int embeddedRevision = 0;
+    private int embeddedBroadcasterId = 0;
 
     public InteractionYoutubeTV(ResultSet set, Item baseItem) throws SQLException {
         super(set, baseItem);
+        this.loadEmbeddedUrl();
     }
 
     public InteractionYoutubeTV(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
+        this.loadEmbeddedUrl();
+    }
+
+    private void loadEmbeddedUrl() {
+        if (this.isEmbeddedPlayer() && this.getExtradata() != null) this.embeddedUrl = this.getExtradata().trim();
+    }
+
+    public boolean isEmbeddedPlayer() {
+        return "ads_videoplayer".equalsIgnoreCase(this.getBaseItem().getName())
+                || "ads_videoplayer".equalsIgnoreCase(this.getBaseItem().getFullName());
+    }
+
+    public String getEmbeddedUrl() { return this.embeddedUrl; }
+    public int getEmbeddedState() { return this.embeddedState; }
+    public int getEmbeddedStartedAt() { return this.embeddedStartedAt; }
+    public int getEmbeddedOffset() { return this.embeddedOffset; }
+    public int getEmbeddedRevision() { return this.embeddedRevision; }
+    public int getEmbeddedBroadcasterId() { return this.embeddedBroadcasterId; }
+
+    private static int currentUnixTimestamp() {
+        return Emulator.getIntUnixTimestamp();
+    }
+
+    public void setEmbeddedUrl(String url) {
+        this.embeddedUrl = (url == null) ? "" : url;
+        this.setExtradata(this.embeddedUrl);
+        this.embeddedOffset = 0;
+        this.embeddedStartedAt = currentUnixTimestamp();
+        this.embeddedState = this.embeddedUrl.isEmpty() ? 0 : 1;
+        this.embeddedBroadcasterId = 0;
+        this.embeddedRevision++;
+    }
+
+    public void startEmbeddedShare(int broadcasterId) {
+        this.embeddedUrl = "";
+        this.embeddedState = 3;
+        this.embeddedStartedAt = currentUnixTimestamp();
+        this.embeddedOffset = 0;
+        this.embeddedBroadcasterId = broadcasterId;
+        this.embeddedRevision++;
+    }
+
+    public void playEmbedded() {
+        if (this.embeddedUrl.isEmpty()) return;
+        this.embeddedStartedAt = currentUnixTimestamp();
+        this.embeddedState = 1;
+        this.embeddedRevision++;
+    }
+
+    public void pauseEmbedded() {
+        if (this.embeddedState == 1) this.embeddedOffset += Math.max(0, currentUnixTimestamp() - this.embeddedStartedAt);
+        this.embeddedState = 2;
+        this.embeddedRevision++;
+    }
+
+    public void reloadEmbedded() {
+        this.embeddedStartedAt = currentUnixTimestamp();
+        this.embeddedRevision++;
+    }
+
+    public void stopEmbedded() {
+        this.embeddedState = 0;
+        this.embeddedOffset = 0;
+        this.embeddedStartedAt = 0;
+        this.embeddedBroadcasterId = 0;
+        this.embeddedRevision++;
     }
 
     @Override
@@ -64,6 +138,11 @@ public class InteractionYoutubeTV extends HabboItem {
 
     @Override
     public void onPickUp(Room room) {
+        if (this.isEmbeddedPlayer() && this.embeddedState != 0) {
+            this.stopEmbedded();
+            room.sendComposer(new EmbeddedMediaStateComposer(this, 5).compose());
+        }
+
         super.onPickUp(room);
 
         if (this.autoAdvance != null) {
@@ -87,9 +166,14 @@ public class InteractionYoutubeTV extends HabboItem {
     public void onClick(GameClient client, Room room, Object[] objects) throws Exception {
         super.onClick(client, room, objects);
 
+        if (this.isEmbeddedPlayer()) {
+            client.sendResponse(new EmbeddedMediaStateComposer(this, 0));
+            return;
+        }
+
         if (this.currentVideo != null) {
             int startTime = this.offset;
-            if (this.playing) startTime += Emulator.getIntUnixTimestamp() - this.startedWatchingAt;
+            if (this.playing) startTime += currentUnixTimestamp() - this.startedWatchingAt;
             client.sendResponse(new YoutubeVideoComposer(this.getId(), this.currentVideo, this.playing, startTime));
         }
     }

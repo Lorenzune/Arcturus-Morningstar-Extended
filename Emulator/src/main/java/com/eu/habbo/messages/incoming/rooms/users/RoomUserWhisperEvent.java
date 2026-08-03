@@ -32,6 +32,9 @@ public class RoomUserWhisperEvent extends MessageHandler {
             if (RoomChatMessage.SAVE_ROOM_CHATS) {
                 Emulator.getThreading().run(chatMessage);
             }
+
+            Emulator.getGameEnvironment().getRewardTrackManager()
+                    .addProgress(this.client.getHabbo().getHabboInfo().getId(), "chat_with_someone", 1);
         } else {
             String reportMessage = Emulator.getTexts().getValue("scripter.warning.chat.length").replace("%username%", this.client.getHabbo().getHabboInfo().getUsername()).replace("%length%", chatMessage.getMessage().length() + "");
             ScripterManager.scripterDetected(this.client, reportMessage);

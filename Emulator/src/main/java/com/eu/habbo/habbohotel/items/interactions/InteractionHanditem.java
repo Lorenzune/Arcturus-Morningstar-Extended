@@ -1,6 +1,7 @@
 package com.eu.habbo.habbohotel.items.interactions;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
 import com.eu.habbo.habbohotel.items.Item;
 import com.eu.habbo.habbohotel.rooms.Room;
@@ -36,7 +37,9 @@ public class InteractionHanditem extends InteractionDefault {
         if (!this.getExtradata().equals("0")) return;
 
         HabboItem instance = this;
-        room.giveHandItem(roomUnit, this.getBaseItem().getRandomVendingItem());
+        int handItemId = this.getBaseItem().getRandomVendingItem();
+        room.giveHandItem(roomUnit, handItemId);
+        DailyTaskActionMatcher.addFurniHandItemProgress(room.getHabbo(roomUnit), handItemId);
 
         if (this.getBaseItem().getStateCount() > 1) {
             this.setExtradata("1");

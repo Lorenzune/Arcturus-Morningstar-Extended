@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.incoming.rooms.items;
 
+import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.items.FurnitureType;
 import com.eu.habbo.habbohotel.items.interactions.*;
 import com.eu.habbo.habbohotel.modtool.ScripterManager;
@@ -130,6 +131,8 @@ public class RoomPlaceItemEvent extends MessageHandler {
         this.client.sendResponse(new RemoveHabboItemComposer(item.getGiftAdjustedId()));
         this.client.getHabbo().getInventory().getItemsComponent().removeHabboItem(item.getId());
         item.setFromGift(false);
+        Emulator.getGameEnvironment().getRewardTrackManager()
+                .addProgress(this.client.getHabbo().getHabboInfo().getId(), "place_item", 1);
 
         if (BuildersClubRoomSupport.isTrackedItem(item.getId())) {
             int trackedUserId = BuildersClubRoomSupport.getTrackedUserId(item.getId());

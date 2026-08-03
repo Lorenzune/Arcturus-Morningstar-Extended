@@ -2,6 +2,7 @@ package com.eu.habbo.messages.incoming.rooms.bots;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.bots.Bot;
+import com.eu.habbo.habbohotel.bots.BotManager;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.messages.incoming.MessageHandler;
 
@@ -13,14 +14,25 @@ public class BotPlaceEvent extends MessageHandler {
         if (room == null)
             return;
 
-        Bot bot = this.client.getHabbo().getInventory().getBotsComponent().getBot(this.packet.readInt());
+        int botId = Math.abs(this.packet.readInt());
+
+        int x = this.packet.readInt();
+        int y = this.packet.readInt();
+        Bot bot = this.client.getHabbo().getInventory().getBotsComponent().getBot(botId);
+        boolean placingBot = bot != null;
+
+        if (!placingBot) {
+            bot = room.getBot(botId);
+        }
 
         if (bot == null)
             return;
 
-        int x = this.packet.readInt();
-        int y = this.packet.readInt();
-
-        Emulator.getGameEnvironment().getBotManager().placeBot(bot, this.client.getHabbo(), this.client.getHabbo().getHabboInfo().getCurrentRoom(), room.getLayout().getTile((short) x, (short) y));
+        BotManager botManager = Emulator.getGameEnvironment().getBotManager();
+        if (placingBot) {
+            botManager.placeBot(bot, this.client.getHabbo(), room, room.getLayout().getTile((short) x, (short) y));
+        } else {
+            botManager.moveBot(bot, this.client.getHabbo(), room, room.getLayout().getTile((short) x, (short) y));
+        }
     }
 }

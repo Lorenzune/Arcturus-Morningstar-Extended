@@ -2,6 +2,7 @@ package com.eu.habbo.habbohotel.rooms;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.bots.Bot;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.items.Item;
 import com.eu.habbo.habbohotel.items.interactions.InteractionStackWalkHelper;
 import com.eu.habbo.habbohotel.items.interactions.InteractionTileWalkMagic;
@@ -288,6 +289,8 @@ public class RoomUnit {
       }
 
       this.tilesWalked++;
+
+      DailyTaskActionMatcher.addFurniWalkProgress(habbo, item);
 
       RoomUserRotation oldRotation = this.getBodyRotation();
       this.setRotation(

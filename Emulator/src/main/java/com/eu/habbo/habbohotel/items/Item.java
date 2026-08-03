@@ -102,17 +102,24 @@ public class Item implements ISerialize {
             interactionTypeName = "default";
         }
 
-        this.interactionType = Emulator.getGameEnvironment().getItemManager().getItemInteraction(interactionTypeName.toLowerCase());
+        ItemManager itemManager = Emulator.getGameEnvironment().getItemManager();
+        this.interactionType = itemManager.getItemInteraction(interactionTypeName.toLowerCase());
 
         if ((this.interactionType != null)
                 && "default".equalsIgnoreCase(this.interactionType.getName())
                 && (this.fullName != null)
                 && this.fullName.toLowerCase().startsWith("wf_")) {
-            ItemInteraction fallbackInteraction = Emulator.getGameEnvironment().getItemManager().getItemInteraction(this.fullName.toLowerCase());
+            ItemInteraction fallbackInteraction = itemManager.getItemInteraction(this.fullName.toLowerCase());
 
             if ((fallbackInteraction != null) && !"default".equalsIgnoreCase(fallbackInteraction.getName())) {
                 this.interactionType = fallbackInteraction;
             }
+        }
+
+        if ("ads_videoplayer".equalsIgnoreCase(this.name) || "ads_videoplayer".equalsIgnoreCase(this.fullName)) {
+            ItemInteraction videoInteraction = itemManager.getItemInteraction("youtube");
+
+            if (videoInteraction != null) this.interactionType = videoInteraction;
         }
 
         this.stateCount = set.getShort("interaction_modes_count");

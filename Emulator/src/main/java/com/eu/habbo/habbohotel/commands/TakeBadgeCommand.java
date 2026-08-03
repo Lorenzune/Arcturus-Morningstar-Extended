@@ -10,6 +10,7 @@ import com.eu.habbo.habbohotel.users.HabboManager;
 import com.eu.habbo.habbohotel.users.inventory.BadgesComponent;
 import com.eu.habbo.messages.outgoing.inventory.InventoryBadgesComposer;
 import com.eu.habbo.messages.outgoing.users.UserBadgesComposer;
+import com.eu.habbo.messages.outgoing.users.InClientLinkComposer;
 
 public class TakeBadgeCommand extends Command {
     public TakeBadgeCommand() {
@@ -60,6 +61,10 @@ public class TakeBadgeCommand extends Command {
                 gameClient.getHabbo().whisper(Emulator.getTexts().getValue("commands.succes.cmd_take_badge"), RoomChatMessageBubbles.ALERT);
 
                 BadgesComponent.deleteBadge(userId, badge);
+                gameClient.sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
+                if (habbo != null && habbo.getClient() != gameClient) {
+                    habbo.getClient().sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
+                }
             }
         }
 

@@ -32,6 +32,8 @@ public class RoomUserGiveRespectEvent extends MessageHandler {
             }
 
             this.client.getHabbo().respect(target);
+            Emulator.getGameEnvironment().getRewardTrackManager()
+                    .addProgress(this.client.getHabbo().getHabboInfo().getId(), "give_respect", 1);
         }
     }
 }

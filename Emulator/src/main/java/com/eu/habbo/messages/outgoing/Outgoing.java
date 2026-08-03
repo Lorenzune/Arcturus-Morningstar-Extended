@@ -593,6 +593,7 @@ public class Outgoing {
     public static final int YouTubeRoomBroadcastComposer = 8001;
     public static final int YouTubeRoomWatchersComposer = 8002;
     public static final int YouTubeRoomSettingsComposer = 8003;
+    public static final int EmbeddedMediaStateComposer = 8004;
 
     // Housekeeping (in-client admin panel) — IDs 9200..9299 reserved
     public static final int HousekeepingUserDetailComposer = 9200;

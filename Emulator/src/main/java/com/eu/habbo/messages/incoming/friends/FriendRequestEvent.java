@@ -98,5 +98,7 @@ public class FriendRequestEvent extends MessageHandler {
         }
 
         Messenger.makeFriendRequest(this.client.getHabbo().getHabboInfo().getId(), targetId);
+        Emulator.getGameEnvironment().getRewardTrackManager()
+                .addProgress(this.client.getHabbo().getHabboInfo().getId(), "request_friend", 1);
     }
 }

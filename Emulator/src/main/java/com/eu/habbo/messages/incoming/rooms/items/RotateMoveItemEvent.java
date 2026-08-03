@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.incoming.rooms.items;
 
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.rooms.FurnitureMovementError;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
@@ -27,6 +28,8 @@ public class RotateMoveItemEvent extends MessageHandler {
 
         RoomTile tile = room.getLayout().getTile((short) x, (short) y);
         if (tile == null) return;
+        RoomTile oldTile = room.getLayout().getTile(item.getX(), item.getY());
+        int oldRotation = item.getRotation();
 
         FurnitureMovementError error = room.canPlaceFurnitureAt(item, this.client.getHabbo(), tile, rotation);
         if (error != FurnitureMovementError.NONE) {
@@ -39,6 +42,14 @@ public class RotateMoveItemEvent extends MessageHandler {
         if (error != FurnitureMovementError.NONE) {
             this.client.sendResponse(new BubbleAlertComposer(BubbleAlertKeys.FURNITURE_PLACEMENT_ERROR.key, error.errorCode));
             this.client.sendResponse(new FloorItemUpdateComposer(item));
+            return;
+        }
+
+        if (oldTile != null && (oldTile.x != tile.x || oldTile.y != tile.y)) {
+            DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.MOVE_ITEM, 1);
+        }
+        if (oldRotation != item.getRotation()) {
+            DailyTaskActionMatcher.addProgress(this.client.getHabbo(), DailyTaskActionMatcher.ROTATE_ITEM, 1);
         }
     }
 }

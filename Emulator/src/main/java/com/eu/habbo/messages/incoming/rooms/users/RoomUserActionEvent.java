@@ -1,6 +1,7 @@
 package com.eu.habbo.messages.incoming.rooms.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomUserAction;
 import com.eu.habbo.habbohotel.users.Habbo;
@@ -64,6 +65,11 @@ public class RoomUserActionEvent extends MessageHandler {
                 switch (action) {
                     case 1:
                         wiredAction = WiredUserActionType.WAVE;
+                        Emulator.getGameEnvironment().getRewardTrackManager()
+                                .addProgress(habbo.getHabboInfo().getId(), "wave", 1);
+                        break;
+                    case 6:
+                        DailyTaskActionMatcher.addProgress(habbo, DailyTaskActionMatcher.JUMP, 1);
                         break;
                     case 2:
                         wiredAction = WiredUserActionType.BLOW_KISS;

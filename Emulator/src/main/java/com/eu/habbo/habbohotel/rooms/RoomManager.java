@@ -375,6 +375,11 @@ public class RoomManager {
 
     // TODO Move to HabboInfo class.
     public List<Room> getRoomsForHabbo(Habbo habbo) {
+        // The navigator must list every room owned by the user, not only rooms
+        // that happen to still be active in memory. This also repairs the list
+        // after room unloading or a resumed session.
+        this.loadRoomsForHabbo(habbo);
+
         List<Room> rooms = new ArrayList<>();
         for (Room room : this.activeRooms.values()) {
             if (room.getOwnerId() == habbo.getHabboInfo().getId()) rooms.add(room);
@@ -774,10 +779,14 @@ public class RoomManager {
             habbo.getClient().sendResponse(new RoomPromotionMessageComposer(null, null));
         }
 
-        if (room.getOwnerId() != habbo.getHabboInfo().getId()
-                && !habbo.getHabboStats().visitedRoom(room.getId())) {
-            AchievementManager.progressAchievement(
-                    habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement("RoomEntry"));
+        if (room.getOwnerId() != habbo.getHabboInfo().getId()) {
+            if (!habbo.getHabboStats().visitedRoom(room.getId())) {
+                AchievementManager.progressAchievement(
+                        habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement("RoomEntry"));
+            }
+
+            Emulator.getGameEnvironment().getRewardTrackManager()
+                    .addProgress(habbo.getHabboInfo().getId(), "enter_other_users_room", 1);
         }
     }
 
@@ -1077,6 +1086,18 @@ public class RoomManager {
                     .sendResponse(new com.eu.habbo.messages.outgoing.rooms.youtube.YouTubeRoomWatchersComposer(
                                     room.getYoutubeWatchers())
                             .compose());
+        }
+
+        for (HabboItem roomItem : room.getFloorItems()) {
+            if (roomItem instanceof com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV) {
+                com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV videoPlayer =
+                        (com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV) roomItem;
+
+                if (videoPlayer.isEmbeddedPlayer() && videoPlayer.getEmbeddedState() != 0) {
+                    habbo.getClient().sendResponse(
+                            new com.eu.habbo.messages.outgoing.rooms.youtube.EmbeddedMediaStateComposer(videoPlayer, 1));
+                }
+            }
         }
 
         habbo.getClient()

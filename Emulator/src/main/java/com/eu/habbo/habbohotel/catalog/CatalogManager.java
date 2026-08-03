@@ -45,6 +45,7 @@ import com.eu.habbo.habbohotel.catalog.layouts.SpacesLayout;
 import com.eu.habbo.habbohotel.catalog.layouts.TraxLayout;
 import com.eu.habbo.habbohotel.catalog.layouts.TrophiesLayout;
 import com.eu.habbo.habbohotel.catalog.layouts.VipBuyLayout;
+import com.eu.habbo.habbohotel.dailytasks.DailyTaskActionMatcher;
 import com.eu.habbo.habbohotel.economy.EconomyOperationId;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
 import com.eu.habbo.habbohotel.guilds.Guild;
@@ -1855,6 +1856,7 @@ public class CatalogManager {
 
                 habbo.getClient().sendResponse(new PurchaseOKComposer(purchasedEvent.catalogItem));
                 habbo.getClient().sendResponse(new InventoryRefreshComposer());
+                DailyTaskActionMatcher.addProgress(habbo, DailyTaskActionMatcher.BUY_FROM_CATALOGUE, amount);
 
                 Set<String> itemIds = new HashSet<>();
 
