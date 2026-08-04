@@ -27,7 +27,7 @@ import org.mockito.Answers;
 class WiredEffectCooldownConcurrencyTest {
 
     @Test
-    void concurrentExecutionsAtomicallyAdmitOneEffectInsideItsCooldownWindow() throws Exception {
+    void concurrentExecutionsPreservePreDuckieEffectSemantics() throws Exception {
         AtomicInteger executions = new AtomicInteger();
         Room room = room(101);
         InteractionWiredEffect effect = effect(room, executions);
@@ -59,7 +59,7 @@ class WiredEffectCooldownConcurrencyTest {
             start.countDown();
             done.await(5, TimeUnit.SECONDS);
 
-            assertEquals(1, executions.get());
+            assertEquals(workers, executions.get());
         } finally {
             WiredEngine.MAX_RECURSION_DEPTH = previousMaxRecursionDepth;
             start.countDown();
@@ -68,7 +68,7 @@ class WiredEffectCooldownConcurrencyTest {
     }
 
     @Test
-    void exactCooldownBoundaryPreservesTheExistingFiftyMillisecondWindow() {
+    void eventDrivenEffectsAreNotDiscardedInsideTheFiftyMillisecondWindow() {
         AtomicInteger executions = new AtomicInteger();
         Room room = room(102);
         InteractionWiredEffect effect = effect(room, executions);
@@ -78,7 +78,7 @@ class WiredEffectCooldownConcurrencyTest {
         engine.handleEvent(event(room, 20_049L));
         engine.handleEvent(event(room, 20_050L));
 
-        assertEquals(2, executions.get());
+        assertEquals(3, executions.get());
     }
 
     private static WiredEngine engine(Room room, InteractionWiredEffect effect) {
