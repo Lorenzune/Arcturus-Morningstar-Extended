@@ -1128,10 +1128,8 @@ public final class WiredManager {
                                 .build();
                         WiredContext ctx = new WiredContext(
                                 event, effect, DefaultWiredServices.getInstance(), new WiredState(100));
-                        if (!engine.tryAcquireEffectCooldown(effect, ctx, millis)) {
-                            continue;
-                        }
                         WiredExecutionScope.execute(effect, ctx);
+                        effect.setCooldown(millis);
                     }
                 }
             }

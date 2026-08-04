@@ -67,6 +67,24 @@ class WiredExecutionGuardTest {
     }
 
     @Test
+    void zeroEventWindowLimitLeavesAdmissionsUnlimited() {
+        Room room = room(78);
+        AtomicInteger limitSignals = new AtomicInteger();
+        WiredExecutionGuard guard = new WiredExecutionGuard(
+                limits(10, 0, 1_000L, 2_000L),
+                () -> 1_000L,
+                (ignoredRoom, eventType, count, limits, banned) -> limitSignals.incrementAndGet(),
+                (ignoredRoom, eventType, kind, depth, maximum) -> {});
+
+        for (int index = 0; index < 1_000; index++) {
+            assertTrue(enterAndExit(guard, room));
+        }
+
+        assertEquals(0, limitSignals.get());
+        assertEquals(0, guard.snapshot(room.getId()).getKilledRemainingSeconds());
+    }
+
+    @Test
     void hotAdmissionCachesRemainIsolatedByRoomEventAndCleanup() {
         Room firstRoom = room(75);
         Room secondRoom = room(76);

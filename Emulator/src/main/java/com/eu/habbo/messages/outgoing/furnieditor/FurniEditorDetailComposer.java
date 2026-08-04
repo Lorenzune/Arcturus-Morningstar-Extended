@@ -67,12 +67,20 @@ public class FurniEditorDetailComposer extends MessageComposer {
         this.response.appendInt(this.catalogItems.size());
         for (Map<String, Object> ci : this.catalogItems) {
             this.response.appendInt((int) ci.get("id"));
+            this.response.appendString((String) ci.getOrDefault("item_ids", ""));
             this.response.appendString((String) ci.getOrDefault("catalog_name", ""));
             this.response.appendInt((int) ci.getOrDefault("cost_credits", 0));
             this.response.appendInt((int) ci.getOrDefault("cost_points", 0));
             this.response.appendInt((int) ci.getOrDefault("points_type", 0));
             this.response.appendInt((int) ci.getOrDefault("page_id", -1));
             this.response.appendString((String) ci.getOrDefault("page_caption", ""));
+            this.response.appendInt((int) ci.getOrDefault("amount", 1));
+            this.response.appendBoolean("1".equals(String.valueOf(ci.getOrDefault("club_only", "0"))));
+            this.response.appendString((String) ci.getOrDefault("extradata", ""));
+            this.response.appendBoolean("1".equals(String.valueOf(ci.getOrDefault("have_offer", "1"))));
+            this.response.appendInt((int) ci.getOrDefault("offer_id", 0));
+            this.response.appendInt((int) ci.getOrDefault("limited_stack", 0));
+            this.response.appendInt((int) ci.getOrDefault("order_number", 0));
         }
 
         // furnidata JSON string

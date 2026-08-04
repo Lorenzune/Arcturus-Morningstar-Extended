@@ -23,7 +23,7 @@ final class WiredConfigurationBinder extends ConfigurationBinder {
         this.apply(
                 "wired.signal.max.depth",
                 () -> WiredEffectSendSignal.MAX_SIGNAL_DEPTH =
-                        this.configuration.getInt("wired.signal.max.depth", 100));
+                        this.configuration.getInt("wired.signal.max.depth", 0));
         this.apply(
                 "wired.abuse.max.recursion.depth",
                 () -> WiredEngine.MAX_RECURSION_DEPTH =
@@ -31,7 +31,7 @@ final class WiredConfigurationBinder extends ConfigurationBinder {
         this.apply(
                 "wired.abuse.max.events.per.window",
                 () -> WiredEngine.MAX_EVENTS_PER_WINDOW =
-                        this.configuration.getInt("wired.abuse.max.events.per.window", 100));
+                        this.configuration.getInt("wired.abuse.max.events.per.window", 0));
         this.apply(
                 "wired.abuse.rate.limit.window.ms",
                 () -> WiredEngine.RATE_LIMIT_WINDOW_MS =

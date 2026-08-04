@@ -177,7 +177,7 @@ public class BotManager {
                 bot.setRoom(room);
                 bot.onPlaceUpdate();
                 room.addBot(bot);
-                Emulator.getThreading().run(bot);
+                schedule(bot);
                 room.sendComposer(new RoomUsersComposer(bot).compose());
                 room.sendComposer(new RoomUserStatusComposer(bot.getRoomUnit()).compose());
                 habbo.getInventory().getBotsComponent().removeBot(bot);
@@ -244,7 +244,7 @@ public class BotManager {
         bot.getRoomUnit().setZ(room.getTopHeightAt(location.x, location.y));
         bot.getRoomUnit().setPreviousLocationZ(bot.getRoomUnit().getZ());
         bot.needsUpdate(true);
-        Emulator.getThreading().run(bot);
+        schedule(bot);
 
         room.sendComposer(new RoomUserStatusComposer(bot.getRoomUnit()).compose());
     }
@@ -291,7 +291,7 @@ public class BotManager {
                 bot.setOwnerId(receiverInfo.getId());
                 bot.setOwnerName(receiverInfo.getUsername());
                 bot.needsUpdate(true);
-                Emulator.getThreading().run(bot);
+                schedule(bot);
 
                 Habbo receiver = habbo == null
                         ? Emulator.getGameEnvironment().getHabboManager().getHabbo(receiverInfo.getId())
@@ -327,6 +327,10 @@ public class BotManager {
         }
 
         return null;
+    }
+
+    private static void schedule(Bot bot) {
+        Emulator.getThreading().run(bot);
     }
 
     public boolean deleteBot(Bot bot) {

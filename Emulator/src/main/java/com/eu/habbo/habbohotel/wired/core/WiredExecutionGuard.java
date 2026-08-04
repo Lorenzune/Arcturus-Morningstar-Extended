@@ -346,6 +346,9 @@ final class WiredExecutionGuard {
     private boolean isRateLimited(int roomId, Room room, WiredEvent.Type eventType, long now) {
         long windowMs = rateLimitWindowMs();
         int maximumEvents = maxEventsPerWindow();
+        if (maximumEvents <= 0) {
+            return false;
+        }
         RateTrackerCache cached = this.recentRateTracker;
         EventRateTracker tracker;
         boolean limited;

@@ -53,8 +53,9 @@ public final class FurniEditorRepository {
             }
             int usageCount = this.count(connection, "SELECT COUNT(*) FROM items WHERE item_id = ?", itemId);
             List<Map<String, Object>> catalogItems = new ArrayList<>();
-            String sql = "SELECT ci.id AS ci_id, ci.catalog_name, ci.cost_credits, ci.cost_points, "
-                    + "ci.points_type, ci.page_id AS ci_page_id, "
+            String sql = "SELECT ci.id AS ci_id, ci.item_ids, ci.catalog_name, ci.cost_credits, ci.cost_points, "
+                    + "ci.points_type, ci.page_id AS ci_page_id, ci.amount, ci.club_only, ci.extradata, "
+                    + "ci.have_offer, ci.offer_id, ci.limited_stack, ci.order_number, "
                     + "COALESCE(cp.caption, '') AS page_caption "
                     + "FROM catalog_items ci LEFT JOIN catalog_pages cp ON ci.page_id = cp.id "
                     + "WHERE " + catalogTokenSql("ci.item_ids");
@@ -316,12 +317,20 @@ public final class FurniEditorRepository {
     private static Map<String, Object> readCatalogReference(ResultSet set) throws SQLException {
         Map<String, Object> reference = new HashMap<>();
         reference.put("id", set.getInt("ci_id"));
+        reference.put("item_ids", set.getString("item_ids"));
         reference.put("catalog_name", set.getString("catalog_name"));
         reference.put("cost_credits", set.getInt("cost_credits"));
         reference.put("cost_points", set.getInt("cost_points"));
         reference.put("points_type", set.getInt("points_type"));
         reference.put("page_id", set.getInt("ci_page_id"));
         reference.put("page_caption", set.getString("page_caption"));
+        reference.put("amount", set.getInt("amount"));
+        reference.put("club_only", set.getString("club_only"));
+        reference.put("extradata", set.getString("extradata"));
+        reference.put("have_offer", set.getString("have_offer"));
+        reference.put("offer_id", set.getInt("offer_id"));
+        reference.put("limited_stack", set.getInt("limited_stack"));
+        reference.put("order_number", set.getInt("order_number"));
         return Collections.unmodifiableMap(reference);
     }
 

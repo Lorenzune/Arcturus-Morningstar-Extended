@@ -93,6 +93,12 @@ public class NickIconsComponent {
         }
     }
 
+    public void deleteNickIcon(UserNickIcon nickIcon) {
+        this.removeNickIcon(nickIcon);
+        nickIcon.needsDelete(true);
+        persist(nickIcon);
+    }
+
     public void setActive(int nickIconId) {
         synchronized (this.nickIcons) {
             for (UserNickIcon nickIcon : this.nickIcons) {
@@ -100,7 +106,7 @@ public class NickIconsComponent {
 
                 if (nickIcon.isActive() != shouldBeActive) {
                     nickIcon.setActive(shouldBeActive);
-                    Emulator.getThreading().run(nickIcon);
+                    persist(nickIcon);
                 }
             }
         }
@@ -111,7 +117,7 @@ public class NickIconsComponent {
             for (UserNickIcon nickIcon : this.nickIcons) {
                 if (nickIcon.isActive()) {
                     nickIcon.setActive(false);
-                    Emulator.getThreading().run(nickIcon);
+                    persist(nickIcon);
                 }
             }
         }
@@ -121,5 +127,9 @@ public class NickIconsComponent {
         synchronized (this.nickIcons) {
             this.nickIcons.clear();
         }
+    }
+
+    private static void persist(UserNickIcon nickIcon) {
+        Emulator.getThreading().run(nickIcon);
     }
 }

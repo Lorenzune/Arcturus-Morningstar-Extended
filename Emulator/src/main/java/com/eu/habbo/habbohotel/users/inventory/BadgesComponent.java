@@ -4,6 +4,7 @@ import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.permissions.Rank;
 import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.habbohotel.users.HabboBadge;
+import com.eu.habbo.networking.gameserver.badges.BadgeLeaderboardHttpHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,9 @@ public class BadgesComponent {
         try (Connection connection = Emulator.getDatabase().getDataSource().getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE users_badges FROM users_badges WHERE user_id = ? AND badge_code LIKE ?")) {
             statement.setInt(1, userId);
             statement.setString(2, badge);
-            statement.execute();
+            if (statement.executeUpdate() > 0) {
+                BadgeLeaderboardHttpHandler.invalidateCache();
+            }
         } catch (SQLException e) {
             LOGGER.error("Caught SQL exception", e);
         }

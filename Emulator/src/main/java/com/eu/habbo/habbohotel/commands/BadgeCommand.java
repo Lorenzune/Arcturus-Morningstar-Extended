@@ -6,6 +6,8 @@ import com.eu.habbo.habbohotel.rooms.RoomChatMessageBubbles;
 import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.habbohotel.users.HabboInfo;
 import com.eu.habbo.habbohotel.users.HabboManager;
+import com.eu.habbo.messages.outgoing.users.InClientLinkComposer;
+import com.eu.habbo.networking.gameserver.badges.BadgeLeaderboardHttpHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ public class BadgeCommand extends Command {
             if (habbo != null) {
                 String senderName = gameClient.getHabbo().getHabboInfo().getUsername();
                 if (habbo.addBadge(params[2], senderName)) {
+                    gameClient.sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
                     gameClient.getHabbo().whisper(Emulator.getTexts().getValue("commands.succes.cmd_badge.given").replace("%user%", params[1]).replace("%badge%", params[2]), RoomChatMessageBubbles.ALERT);
                 } else {
                     gameClient.getHabbo().whisper(Emulator.getTexts().getValue("commands.error.cmd_badge.already_owned").replace("%user%", params[1]).replace("%badge%", params[2]), RoomChatMessageBubbles.ALERT);
@@ -70,8 +73,11 @@ public class BadgeCommand extends Command {
                         try (PreparedStatement statement = connection.prepareStatement("INSERT INTO users_badges (`id`, `user_id`, `slot_id`, `badge_code`) VALUES (null, ?, 0, ?)")) {
                             statement.setInt(1, habboInfo.getId());
                             statement.setString(2, params[2]);
-                            statement.execute();
+                            statement.executeUpdate();
                         }
+
+                        BadgeLeaderboardHttpHandler.invalidateCache();
+                        gameClient.sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
 
                         gameClient.getHabbo().whisper(Emulator.getTexts().getValue("commands.succes.cmd_badge.given").replace("%user%", params[1]).replace("%badge%", params[2]), RoomChatMessageBubbles.ALERT);
                         return true;

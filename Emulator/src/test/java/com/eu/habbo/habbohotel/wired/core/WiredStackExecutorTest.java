@@ -81,13 +81,46 @@ class WiredStackExecutorTest {
         assertEquals(List.of(), calls);
     }
 
+    @Test
+    void receiveSignalFeedbackUsesHistoricalRoomUsageBudget() {
+        List<String> calls = new ArrayList<>();
+        Room room = room(94);
+        WiredStack stack = new WiredStack(
+                item(9_401), trigger(calls, true), List.of(), List.of(context -> calls.add("effect")));
+        WiredExecutionGuard executionGuard = executionGuard(4_000L, 10);
+        WiredStackExecutor executor = executor(calls, 4_000L, executionGuard);
+        WiredEvent signal = event(room, WiredEvent.Type.SIGNAL_RECEIVED);
+
+        for (int index = 0; index < 20; index++) {
+            executor.executeEvent(stack, signal, 4_000L, false);
+        }
+
+        long executedEffects = calls.stream().filter("effect"::equals).count();
+        assertTrue(executedEffects > 0);
+        assertTrue(executedEffects < 20);
+        assertTrue(executionGuard.snapshot(room.getId()).getUsageCurrentWindow() > 10);
+    }
+
     private static WiredStackExecutor executor(List<String> calls, long now) {
-        WiredConditionEvaluator conditionEvaluator = new WiredConditionEvaluator((room, format, arguments) -> {});
-        WiredExecutionGuard executionGuard = new WiredExecutionGuard(
-                new WiredExecutionGuard.Limits(10, 100, 1_000L, 0L, 10_000, 10_000, 100, 50, 150, 70, 5, 2, 60),
+        return executor(calls, now, 10_000);
+    }
+
+    private static WiredStackExecutor executor(List<String> calls, long now, int monitorUsageLimit) {
+        return executor(calls, now, executionGuard(now, monitorUsageLimit));
+    }
+
+    private static WiredExecutionGuard executionGuard(long now, int monitorUsageLimit) {
+        return new WiredExecutionGuard(
+                new WiredExecutionGuard.Limits(
+                        10, 100, 1_000L, 0L, 10_000, monitorUsageLimit, 100, 50, 150, 70, 5, 2, 60),
                 () -> now,
                 (room, eventType, count, limits, banned) -> {},
                 (room, eventType, kind, depth, maximum) -> {});
+    }
+
+    private static WiredStackExecutor executor(
+            List<String> calls, long now, WiredExecutionGuard executionGuard) {
+        WiredConditionEvaluator conditionEvaluator = new WiredConditionEvaluator((room, format, arguments) -> {});
         WiredStackExecutor.Hooks hooks = new WiredStackExecutor.Hooks() {
             @Override
             public List<InteractionWiredEffect> executeSelectors(WiredStack stack, WiredContext context) {
@@ -163,7 +196,11 @@ class WiredStackExecutorTest {
     }
 
     private static WiredEvent event(Room room) {
-        return WiredEvent.builder(WiredEvent.Type.CUSTOM, room)
+        return event(room, WiredEvent.Type.CUSTOM);
+    }
+
+    private static WiredEvent event(Room room, WiredEvent.Type type) {
+        return WiredEvent.builder(type, room)
                 .createdAtMs(1_000L)
                 .build();
     }

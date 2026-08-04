@@ -1088,6 +1088,18 @@ public class RoomManager {
                             .compose());
         }
 
+        for (HabboItem roomItem : room.getFloorItems()) {
+            if (roomItem instanceof com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV) {
+                com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV videoPlayer =
+                        (com.eu.habbo.habbohotel.items.interactions.InteractionYoutubeTV) roomItem;
+
+                if (videoPlayer.isEmbeddedPlayer() && videoPlayer.getEmbeddedState() != 0) {
+                    habbo.getClient().sendResponse(
+                            new com.eu.habbo.messages.outgoing.rooms.youtube.EmbeddedMediaStateComposer(videoPlayer, 1));
+                }
+            }
+        }
+
         habbo.getClient()
                 .sendResponse(new com.eu.habbo.messages.outgoing.soundboard.SoundboardSettingsComposer(
                                 room.isSoundboardEnabled(),

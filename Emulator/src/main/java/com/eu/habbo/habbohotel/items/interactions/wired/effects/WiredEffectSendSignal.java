@@ -40,7 +40,8 @@ public class WiredEffectSendSignal extends InteractionWiredEffect {
 
     public static final WiredEffectType type = WiredEffectType.SEND_SIGNAL;
 
-    public static volatile int MAX_SIGNAL_DEPTH = 100;
+    /** Zero disables the signal-chain depth limit. */
+    public static volatile int MAX_SIGNAL_DEPTH = 0;
 
     private static final int ANTENNA_PICKED = 0;
     private static final int ANTENNA_TRIGGER = 1;
@@ -76,13 +77,14 @@ public class WiredEffectSendSignal extends InteractionWiredEffect {
         if (room == null) return;
 
         LOGGER.debug(
-                "[SendSignal] execute() called, itemId={}, antennaSource={}, pickedItems={}",
+                "[SendSignal] execute() called, itemId={}, antennaSource={}, pickedItems={}, configuredDelay={}",
                 this.getId(),
                 antennaSource,
-                this.items.size());
+                this.items.size(),
+                this.getDelay());
 
         int currentDepth = ctx.event().getCallStackDepth();
-        if (currentDepth >= MAX_SIGNAL_DEPTH) {
+        if (hasReachedMaxSignalDepth(currentDepth)) {
             LOGGER.debug("[SendSignal] Max signal depth reached ({}), aborting", currentDepth);
             return;
         }
@@ -544,11 +546,17 @@ public class WiredEffectSendSignal extends InteractionWiredEffect {
 
     @Override
     protected long requiredCooldown() {
-        return COOLDOWN_TRIGGER_STACKS;
+        // Signal chains are intentionally allowed to feed back into the same
+        // sender during one deferred WIRED publication cycle.
+        return 0L;
     }
 
     protected boolean dispatchSignalEvent(WiredEvent event) {
         return WiredManager.dispatchEffectTriggeredEvent(event);
+    }
+
+    static boolean hasReachedMaxSignalDepth(int currentDepth) {
+        return MAX_SIGNAL_DEPTH > 0 && currentDepth >= MAX_SIGNAL_DEPTH;
     }
 
     static class JsonData {

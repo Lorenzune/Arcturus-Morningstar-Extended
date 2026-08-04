@@ -1,6 +1,5 @@
 package com.eu.habbo.messages.incoming.inventory.nickicons;
 
-import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.users.UserNickIcon;
 import com.eu.habbo.messages.incoming.MessageHandler;
 import com.eu.habbo.messages.outgoing.inventory.nickicons.UserNickIconsComposer;
@@ -22,9 +21,7 @@ public class DeleteNickIconEvent extends MessageHandler {
 
         boolean wasActive = nickIcon.isActive();
 
-        this.client.getHabbo().getInventory().getNickIconsComponent().removeNickIcon(nickIcon);
-        nickIcon.needsDelete(true);
-        Emulator.getThreading().run(nickIcon);
+        this.client.getHabbo().getInventory().getNickIconsComponent().deleteNickIcon(nickIcon);
 
         this.client.sendResponse(new UserNickIconsComposer(this.client.getHabbo()));
 

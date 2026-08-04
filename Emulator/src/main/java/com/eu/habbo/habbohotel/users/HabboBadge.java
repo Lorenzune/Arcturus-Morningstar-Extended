@@ -1,6 +1,8 @@
 package com.eu.habbo.habbohotel.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.messages.outgoing.users.InClientLinkComposer;
+import com.eu.habbo.networking.gameserver.badges.BadgeLeaderboardHttpHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +91,10 @@ public class HabboBadge implements Runnable {
             }
         }
         this.needsInsert = false;
+        BadgeLeaderboardHttpHandler.invalidateCache();
+        if (this.habbo != null && this.habbo.getClient() != null) {
+            this.habbo.getClient().sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
+        }
     }
 
     public void needsUpdate(boolean needsUpdate) {

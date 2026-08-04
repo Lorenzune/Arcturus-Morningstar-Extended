@@ -30,6 +30,10 @@ public class BadgeLeaderboardHttpHandler extends ChannelInboundHandlerAdapter {
 
     private static volatile Snapshot cache = null;
 
+    public static void invalidateCache() {
+        cache = null;
+    }
+
     private static final class Snapshot {
         final List<UserBadgeAggregate> badgeUsers;
         final List<UserAchievementAggregate> achievementUsers;

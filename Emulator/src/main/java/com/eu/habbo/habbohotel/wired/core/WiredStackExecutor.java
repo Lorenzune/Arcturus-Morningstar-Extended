@@ -158,6 +158,8 @@ final class WiredStackExecutor {
             return false;
         }
 
+        // Preserve the pre-Duckie monitor contract: every stack, including
+        // Send/Receive Signal feedback, contributes to and respects WIRED usage.
         if (!roomDiagnostics.tryConsumeExecutionBudget(
                 stackCost,
                 currentTime,

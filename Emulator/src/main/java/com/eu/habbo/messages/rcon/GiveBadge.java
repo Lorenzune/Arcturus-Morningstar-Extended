@@ -6,6 +6,8 @@ import com.eu.habbo.habbohotel.users.HabboBadge;
 import com.eu.habbo.habbohotel.users.HabboInfo;
 import com.eu.habbo.habbohotel.users.HabboManager;
 import com.eu.habbo.messages.outgoing.users.AddUserBadgeComposer;
+import com.eu.habbo.messages.outgoing.users.InClientLinkComposer;
+import com.eu.habbo.networking.gameserver.badges.BadgeLeaderboardHttpHandler;
 import com.google.gson.Gson;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -55,6 +57,7 @@ public class GiveBadge extends RCONMessage<GiveBadge.GiveBadgeJSON> {
 
                 habbo.getInventory().getBadgesComponent().addBadge(badge);
                 habbo.getClient().sendResponse(new AddUserBadgeComposer(badge));
+                habbo.getClient().sendResponse(new InClientLinkComposer("badge-leaderboard/refresh"));
 
                 this.message = Emulator.getTexts().getValue("commands.succes.cmd_badge.given").replace("%user%", username).replace("%badge%", badgeCode);
             }
@@ -88,6 +91,8 @@ public class GiveBadge extends RCONMessage<GiveBadge.GiveBadgeJSON> {
                             statement.setString(2, badgeCode);
                             statement.execute();
                         }
+
+                        BadgeLeaderboardHttpHandler.invalidateCache();
 
                         this.message = Emulator.getTexts().getValue("commands.succes.cmd_badge.given").replace("%user%", username).replace("%badge%", badgeCode);
                     }

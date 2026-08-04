@@ -67,7 +67,8 @@ public final class WiredEngine {
     public static volatile int MAX_RECURSION_DEPTH = 10;
 
     /** Maximum events of same type per room within rate limit window before banning */
-    public static volatile int MAX_EVENTS_PER_WINDOW = 100;
+    /** Zero disables the generic per-event window limit. */
+    public static volatile int MAX_EVENTS_PER_WINDOW = 0;
 
     /** Time window for counting rapid events (milliseconds) */
     public static volatile long RATE_LIMIT_WINDOW_MS = 10000;
@@ -482,9 +483,6 @@ public final class WiredEngine {
                     }
                 } else {
                     // Execute immediately
-                    if (!this.effectCooldownService.tryAcquire(effect, ctx, currentTime)) {
-                        continue;
-                    }
                     ctx.state().step();
                     try {
                         WiredExecutionScope.execute(effect, ctx);
@@ -492,6 +490,7 @@ public final class WiredEngine {
                         // Activate box animation after execution
                         if (effect instanceof InteractionWiredEffect) {
                             InteractionWiredEffect wiredEffect = (InteractionWiredEffect) effect;
+                            wiredEffect.setCooldown(currentTime);
                             wiredEffect.activateBox(ctx.room(), ctx.actor().orElse(null), currentTime);
                         }
                     } catch (Exception e) {
@@ -530,10 +529,6 @@ public final class WiredEngine {
                 continue;
             }
 
-            if (!this.effectCooldownService.tryAcquire(effect, ctx, ctx.event().getCreatedAtMs())) {
-                continue;
-            }
-
             ctx.state().step();
             try {
                 WiredExecutionScope.execute(effect, ctx);
@@ -560,6 +555,7 @@ public final class WiredEngine {
         RoomUnit actor = ctx.actor().orElse(null);
 
         for (InteractionWiredEffect wiredEffect : executedSelectors) {
+            wiredEffect.setCooldown(currentTime);
             if (wiredEffect.usesExistingSelectorTargets()) {
                 animateFilteredSelectorBox(room, wiredEffect);
             } else {
@@ -669,13 +665,11 @@ public final class WiredEngine {
         IWiredEffect effect = resolved.effects().getFirst();
         WiredContext context = resolved.context();
         long executionTime = System.currentTimeMillis();
-        if (!this.effectCooldownService.tryAcquire(effect, context, executionTime)) {
-            return;
-        }
         try {
             WiredExecutionScope.execute(effect, context);
 
             if (effect instanceof InteractionWiredEffect wiredEffect) {
+                wiredEffect.setCooldown(executionTime);
                 wiredEffect.activateBox(context.room(), context.actor().orElse(null), executionTime);
             }
         } catch (Exception exception) {
@@ -774,9 +768,6 @@ public final class WiredEngine {
                 WiredInternalVariableSupport.beginUserMoveBatch()) {
             for (IWiredEffect effect : batch) {
                 try {
-                    if (!this.effectCooldownService.tryAcquire(effect, ctx, executionTime)) {
-                        continue;
-                    }
                     if (!useExecutionTimeForCooldown) {
                         ctx.state().step();
                     }
@@ -785,6 +776,7 @@ public final class WiredEngine {
 
                     if (effect instanceof InteractionWiredEffect) {
                         InteractionWiredEffect wiredEffect = (InteractionWiredEffect) effect;
+                        wiredEffect.setCooldown(executionTime);
                         wiredEffect.activateBox(room, actor, executionTime);
                     }
                 } catch (Exception e) {
